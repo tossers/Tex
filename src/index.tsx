@@ -8,4 +8,5 @@ import AppRouter from './routers/index';
 ReactDOM.render((<Provider {...store}><AppRouter/></Provider>),
     document.getElementById('root') as HTMLElement
 );
+
 registerServiceWorker();

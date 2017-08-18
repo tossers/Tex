@@ -12,12 +12,14 @@ export default class AppRouter extends React.Component {
                 <div>
                     <ul>
                         <li><Link to={'/me'}>Me</Link></li>
+                        <li><Link to={'/me/aaa'}>Ca</Link></li>
                         <li><Link to={'/public'}>Public</Link></li>
                     </ul>
                     <Route path={'/'} exact={true} component={Home}/>
                     <Route path={'/login'} component={Login}/>
                     <Route path={'/public'} component={Home}/>
                     <PrivateRoute path={'/me'} component={Me}/>
+                    <PrivateRoute path={'/me/aaa'} component={Home}/>
                 </div>
             </Router>
         );
