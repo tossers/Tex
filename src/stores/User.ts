@@ -1,15 +1,18 @@
 import {action, observable} from 'mobx';
 
 export class User {
-    @observable isLogin;
+    @observable isLogin:boolean;
+
+    @observable uid:string;
 
     @action
-    async login() {
+    async login(userName:string,passWord:string) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                reject(new Error('xxxx'));
-                // this.isLogin = true;
-                // resolve();
+                // reject(new Error('xxxx'));
+                this.isLogin = true;
+                this.uid = userName;
+                resolve();
             }, 1000);
         });
     }
