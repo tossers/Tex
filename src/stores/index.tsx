@@ -1,7 +1,5 @@
-import Demo from '../models/demo'
+import userStore from './User';
 
-import User from '../models/user'
-
-export const demo = new Demo();
-
-export const user = new User();
+export default {
+    userStore
+};

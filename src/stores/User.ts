@@ -1,16 +1,16 @@
-import {observable, action} from 'mobx'
+import {action, observable} from 'mobx';
 
-export default class User {
-
+export class User {
     @observable isLogin;
 
     @action
-    async login(userName: string, userPass: string) {
+    async login() {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                this.isLogin = true;
-                return resolve(this.isLogin);
-            }, 1000)
+                reject(new Error('xxxx'));
+                // this.isLogin = true;
+                // resolve();
+            }, 1000);
         });
     }
 
@@ -19,9 +19,10 @@ export default class User {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 this.isLogin = false;
-                return resolve(this.isLogin);
-            }, 1000)
+                resolve();
+            }, 2000);
         });
     }
-
 }
+
+export default new User();
