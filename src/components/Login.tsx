@@ -1,10 +1,9 @@
 import * as React from 'react';
 import {Redirect} from 'react-router';
 import './Login.css';
-import {User} from '../stores/User';
 import {Location} from 'history';
 
-export class Login extends React.Component<{ location: Location, userStore: User }, { redirectToReferrer: Boolean, isError: Boolean, message: String | null }> {
+export class Login extends React.Component<{ location: Location, userStore: { login: (userName: string, passWord: string) => Promise<void> } }, { redirectToReferrer: Boolean, isError: Boolean, message: String | null }> {
 
     state = {
         redirectToReferrer: false,
@@ -15,7 +14,9 @@ export class Login extends React.Component<{ location: Location, userStore: User
     async login() {
         try {
             this.setState({message: '正在登录', isError: false});
-            await this.props.userStore.login();
+            const userName = (this.refs.userName as HTMLInputElement).value;
+            const userPass = (this.refs.passWord as HTMLInputElement).value;
+            await this.props.userStore.login(userName, userPass);
             this.setState({
                 redirectToReferrer: true
             });
