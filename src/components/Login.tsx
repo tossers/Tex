@@ -2,26 +2,30 @@ import * as React from 'react';
 import {Redirect} from 'react-router';
 import './Login.css';
 import {Location} from 'history';
+import {Form, Icon, Input, Button,Spin,message} from 'antd';
 
-export class Login extends React.Component<{ location: Location, userStore: { login: (userName: string, passWord: string) => Promise<void> } }, { redirectToReferrer: Boolean, isError: Boolean, message: String | null }> {
+export class Login extends React.Component<{ location: Location, userStore: { login: (userName: string, passWord: string) => Promise<void> } },
+    { redirectToReferrer: Boolean, userName: string, passWord: string, spinning: boolean }> {
 
     state = {
         redirectToReferrer: false,
-        isError: false,
-        message: null
+        userName: '',
+        passWord: '',
+        spinning: false
     };
 
     async login() {
+        this.setState({spinning:true});
         try {
-            this.setState({message: '正在登录', isError: false});
-            const userName = (this.refs.userName as HTMLInputElement).value;
-            const userPass = (this.refs.passWord as HTMLInputElement).value;
+            const userName = this.state.userName;
+            const userPass = this.state.passWord;
             await this.props.userStore.login(userName, userPass);
             this.setState({
                 redirectToReferrer: true
             });
         } catch (ex) {
-            this.setState({isError: true, message: ex.message});
+            message.error(ex.message);
+            this.setState({spinning:false});
         }
 
     }
@@ -29,27 +33,33 @@ export class Login extends React.Component<{ location: Location, userStore: { lo
     render() {
 
         const {from} = this.props.location.state || {from: {pathname: '/'}};
-        const {redirectToReferrer, isError, message} = this.state;
+        const {redirectToReferrer} = this.state;
         if (redirectToReferrer) {
             return (<Redirect to={from}/>);
         }
 
         return (
-            <div>
-                <div>
-                    <span>userName:</span><input ref={'userName'}/>
+            <Spin size="large" tip="登录中" spinning={this.state.spinning}>
+                <div className="login">
+                    <Form className="login-form">
+                        <Form.Item>
+                            <Input prefix={<Icon type="user"/>} type="text" onChange={(e) => {
+                                this.setState({userName: e.target.value});
+                            }}/>
+                        </Form.Item>
+                        <Form.Item>
+                            <Input prefix={<Icon type="lock"/>} type="password" onChange={(e) => {
+                                this.setState({passWord: e.target.value});
+                            }}/>
+                        </Form.Item>
+                        <Form.Item>
+                            <Button type="primary" className="login-form-button" htmlType="submit" onClick={() => {
+                                this.login();
+                            }}>Log In</Button>
+                        </Form.Item>
+                    </Form>
                 </div>
-                <div>
-                    <span>passWord:</span><input ref={'passWord'}/>
-                </div>
-                <div>
-                    {message && <div className={isError ? 'error' : ''}>{message}</div>}
-                    <button onClick={() => {
-                        this.login();
-                    }}>Login
-                    </button>
-                </div>
-            </div>
+            </Spin>
         );
     }
 }

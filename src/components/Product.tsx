@@ -10,7 +10,7 @@ export class Product extends React.Component<{
     match: match<{ id: number }>,
     getProduct: (productCode: string) => {},
     product: { name: string, id: number, code: string },
-    entrust: (type: string, productId: string, price: number, quantity: number) => void
+    entrust: (type: string, productId: string, price: number, quantity: number) => Promise<void>
 }, { width: number }> {
 
     state = {
@@ -28,7 +28,7 @@ export class Product extends React.Component<{
     }
 
     render() {
-
+        const {product,entrust} = this.props;
         return (
             <div>
                 <h3>{this.props.product.name}({this.props.product.code})</h3>
@@ -37,8 +37,8 @@ export class Product extends React.Component<{
                     <div className="item" key="b" data-grid={{x: 4, y: 0, w: 5, h: 14}}>图表</div>
                     <div className="item" key="c" data-grid={{x: 9, y: 0, w: 3, h: 8}}>近期交易</div>
                     <div className="item" key="order" data-grid={{x: 9, y: 6, w: 3, h: 6}}>
-                        <Entrust entrust={(type: string, price: number, quantity: number) => {
-                            this.props.entrust(type, this.props.product.id.toString(), price, quantity);
+                        <Entrust entrust={async (type: string, price: number, quantity: number) => {
+                            return entrust(type, product.id.toString(), price, quantity);
                         }}/>
                     </div>
                     <div className="item" key="d" data-grid={{x: 0, y: 8, w: 9, h: 4}}>持有仓位</div>

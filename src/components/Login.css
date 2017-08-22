@@ -1,7 +1,13 @@
-.texBox {
-    font-size: 20px;
+.login{
+    padding:40px;
 }
-
-.error {
-    color: red;
+.login .login-form {
+    max-width: 300px;
+    margin:0px auto;
+}
+.login .login-form-forgot {
+    float: right;
+}
+.login .login-form-button {
+    width: 100%;
 }

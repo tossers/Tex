@@ -8,8 +8,8 @@ import {inject, observer} from 'mobx-react';
             stores.productStore.setCurrent(productCode);
         },
         product:stores.productStore.current,
-        entrust:(type:string,productId:string,price:number,quantity:number)=>{
-            stores.entrustStore.entrust(type,productId,price,quantity);
+        entrust:async function(type:string,productId:string,price:number,quantity:number){
+            return stores.entrustStore.entrust(type,productId,price,quantity);
         }
     };
 })

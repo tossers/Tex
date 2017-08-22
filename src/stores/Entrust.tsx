@@ -7,8 +7,8 @@ class Entrust {
     lists: string[] = [];
 
     @action
-    entrust(type: string, productId: string, price: number, quantity: number) {
-        entrust(type, productId, price, quantity);
+    async entrust(type: string, productId: string, price: number, quantity: number) {
+        return entrust(type, productId, price, quantity);
     }
 
 }

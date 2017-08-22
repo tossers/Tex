@@ -1,5 +1,7 @@
 import * as React from 'react';
-import {Navigation} from './Navigation';
+import {Link} from 'react-router-dom';
+import Menu from 'antd/lib/menu';
+import 'antd/lib/menu/style';
 
 export class Header extends React.Component<{
     navigation: { text: string, link: string }[],
@@ -15,7 +17,13 @@ export class Header extends React.Component<{
 
         return (
             <div>
-                <Navigation navigation={this.props.navigation} user={this.props.user}/>
+                <Menu mode={'horizontal'}>
+                    {this.props.navigation.map((item)=>{
+                        return (
+                            <Menu.Item key={item.link}><Link to={item.link}/>{item.text}</Menu.Item>
+                        );
+                    })}
+                </Menu>
             </div>
         );
 

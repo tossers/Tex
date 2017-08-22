@@ -4,6 +4,7 @@ import {Header} from '../containers/Header';
 import {Product} from '../containers/Product';
 import {Login} from '../containers/Login';
 import {PrivateRoute} from '../containers/PrivateRoute';
+import 'antd/dist/antd.css';
 
 export default class AppRouter extends React.Component {
 
@@ -11,7 +12,7 @@ export default class AppRouter extends React.Component {
         return (
             <div>
                 <Router>
-                    <div style={{'width':'1200px','margin':'0px auto',fontFamily:'consolas,微软雅黑'}}>
+                    <div style={{fontFamily:'consolas,微软雅黑'}}>
                         <Route path="/" component={Header}/>
                             <Route path="/login" component={Login}/>
                         <div>

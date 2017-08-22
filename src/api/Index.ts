@@ -18,7 +18,7 @@ export async function login(userName: string, passWord: string) {
         token = res.data.token;
         return res.data.token;
     }).catch((ex) => {
-        throw new Error(ex.response.data.err);
+        throw new Error(ex.response.data);
     });
 }
 
@@ -32,7 +32,7 @@ export async function getProducts() {
 
 export async function entrust(type: string, productId: string, price: number, quantity: number) {
     const orderType = type === 'buy' ? 1 : 2;
-    axios.post(orderUrl, {
+    return axios.post(orderUrl, {
         lever: 1,
         orderType,
         price,
@@ -45,6 +45,8 @@ export async function entrust(type: string, productId: string, price: number, qu
         }
     }).then((res) => {
         return res.data.list;
+    }).catch((ex)=>{
+        throw new Error(ex.response.data);
     });
 }
 

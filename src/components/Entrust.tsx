@@ -1,12 +1,23 @@
 import * as React from 'react';
 import './Entrust.css';
+import {notification} from 'antd';
 
-export class Entrust extends React.Component<{ entrust: (type: string, price: number, quantity: number) => void }> {
+export class Entrust extends React.Component<{ entrust: (type: string, price: number, quantity: number) => Promise<void> }> {
 
     entrust(type: string) {
         const price = Number((this.refs.price as HTMLInputElement).value);
         const quantity = Number((this.refs.quantity as HTMLInputElement).value)
-        this.props.entrust(type, price, quantity);
+        this.props.entrust(type, price, quantity).then(() => {
+            notification.success({
+                message: '下单成功',
+                description: '下单成功'
+            });
+        }).catch((ex) => {
+            notification.error({
+                message: '下单失败',
+                description: ex.message,
+            });
+        });
     }
 
     render() {
