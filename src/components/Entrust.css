@@ -1,0 +1,28 @@
+.entrust{
+    padding:20px;
+}
+
+.entrust span{
+    width: 100px;
+    text-align: right;
+    padding-right: 20px;
+}
+.entrust span:after{
+    content: ':';
+}
+
+.entrust .item{
+    padding:4px;
+}
+
+.entrust input{
+    height: 30px;
+    padding:10px;
+    text-align: right;
+}
+
+.entrust button{
+    height: 50px;
+    width: 100px;
+    margin: 10px;
+}

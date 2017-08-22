@@ -1,27 +1,28 @@
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
 import * as React from 'react';
+import {Header} from '../containers/Header';
+import {Product} from '../containers/Product';
 import {Login} from '../containers/Login';
-import {Home} from '../containers/Home';
-import {Me} from '../containers/Me';
 import {PrivateRoute} from '../containers/PrivateRoute';
 
 export default class AppRouter extends React.Component {
+
     render() {
         return (
-            <Router>
-                <div>
-                    <ul>
-                        <li><Link to={'/me'}>Me</Link></li>
-                        <li><Link to={'/me/aaa'}>Ca</Link></li>
-                        <li><Link to={'/public'}>Public</Link></li>
-                    </ul>
-                    <Route path={'/'} exact={true} component={Home}/>
-                    <Route path={'/login'} component={Login}/>
-                    <Route path={'/public'} component={Home}/>
-                    <PrivateRoute path={'/me'} component={Me}/>
-                    <PrivateRoute path={'/me/aaa'} component={Home}/>
-                </div>
-            </Router>
+            <div>
+                <Router>
+                    <div style={{'width':'1200px','margin':'0px auto',fontFamily:'consolas,微软雅黑'}}>
+                        <Route path="/" component={Header}/>
+                            <Route path="/login" component={Login}/>
+                        <div>
+                            <PrivateRoute path="/product/:id" component={Product}/>
+                        </div>
+                        <div>
+                            CopyRight&copy;Tex.tuling.me
+                        </div>
+                    </div>
+                </Router>
+            </div>
         );
     }
 }

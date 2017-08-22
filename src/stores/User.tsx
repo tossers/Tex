@@ -1,12 +1,14 @@
 import {action, observable} from 'mobx';
-import {login} from '../api/User';
+import {login} from '../api/Index';
 
 export class User {
-    @observable isLogin: boolean;
+    @observable isLogin: boolean = false;
 
     @observable uid: string;
 
     @observable token: string;
+
+    @observable nickName:string;
 
     @action
     async login(userName: string, passWord: string) {
@@ -14,6 +16,7 @@ export class User {
             this.isLogin = true;
             this.token = token;
             this.uid = token;
+            this.nickName = token;
         });
     }
 
