@@ -4,7 +4,7 @@ import {inject, observer} from 'mobx-react';
 @inject((stores,props)=>{
     return {
         ...props,
-        getProduct:(productCode:string)=>{
+        getProduct:function(productCode:string){
             stores.productStore.setCurrent(productCode);
         },
         product:stores.productStore.current,

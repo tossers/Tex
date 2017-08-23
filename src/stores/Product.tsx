@@ -11,7 +11,7 @@ export class Product {
 export class ProductList {
     @observable list: Product[] = [];
 
-    @observable currentProductCode:string = '';
+    @observable currentProductCode: string = '';
 
     @action
     loadProducts() {
@@ -20,13 +20,15 @@ export class ProductList {
         });
     }
 
-    @action setCurrent(productCode:string){
+    @action
+    setCurrent(productCode: string) {
         this.currentProductCode = productCode;
     }
 
-    @computed get current(){
-        const temp = this.list.filter((product)=>product.code === this.currentProductCode);
-        if(!!temp.length) {
+    @computed
+    get current() {
+        const temp = this.list.filter((product) => product.code === this.currentProductCode);
+        if (!!temp.length) {
             return temp[0];
         }
         return {};
