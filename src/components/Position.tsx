@@ -3,7 +3,7 @@ import * as React from 'react';
 
 const TabPane = Tabs.TabPane;
 
-export class Position extends React.Component {
+export class Position extends React.Component<{ entrusts: { id: number, price: number; quantity: number }[] }, {}> {
 
     render() {
 
@@ -38,10 +38,10 @@ export class Position extends React.Component {
 
         return (
             <Tabs>
-                <TabPane tab="持仓单" key="1">
-                    <Table columns={columns} pagination={false} size="small"/>
+                <TabPane tab="委托单" key="1">
+                    <Table dataSource={this.props.entrusts} columns={columns} pagination={false} scroll={{y:60}} size="small"/>
                 </TabPane>
-                <TabPane tab="委托单" key="2">
+                <TabPane tab="持仓单" key="2">
                     <Table columns={columns} pagination={false} size="small"/>
                 </TabPane>
             </Tabs>

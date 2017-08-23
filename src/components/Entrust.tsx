@@ -50,13 +50,18 @@ export class Entrust extends React.Component<{ entrust: (type: string, price: nu
                             {...formItemLayout}
                             label="仓位">
                             <InputNumber defaultValue={this.state.quantity} min={0} precision={3}
-                                         formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}/>
+                                         formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                         onChange={(value) => {
+                                             this.setState({quantity: Number(value)});
+                                         }}/>
                         </FormItem>
                         <FormItem
                             {...formItemLayout}
                             label="价格">
                             <InputNumber formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                         defaultValue={this.state.price} min={0} precision={3}/>
+                                         defaultValue={this.state.price} min={0} precision={3} onChange={(value) => {
+                                this.setState({price: Number(value)});
+                            }}/>
                         </FormItem>
                         <FormItem>
                             <Button type="primary" size="large" onClick={(e) => {

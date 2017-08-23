@@ -45,7 +45,20 @@ export async function entrust(type: string, productId: string, price: number, qu
         }
     }).then((res) => {
         return res.data.list;
-    }).catch((ex)=>{
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+export async function entrusts(productId: number) {
+    return axios.get(orderUrl, {
+        params: {
+            token: token,
+            filter: JSON.stringify({productId})
+        }
+    }).then((res) => {
+        return res.data.list;
+    }).catch((ex) => {
         throw new Error(ex.response.data);
     });
 }
