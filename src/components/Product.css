@@ -3,5 +3,5 @@
     margin:0px auto;
 }
 .product .item{
-    background-color: #cccccc;
+    overflow: hidden;
 }

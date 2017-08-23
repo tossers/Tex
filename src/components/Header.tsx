@@ -4,9 +4,10 @@ import Menu from 'antd/lib/menu';
 import 'antd/lib/menu/style';
 
 export class Header extends React.Component<{
-    navigation: { text: string, link: string }[],
+    navigation: { text: string, link: string, id:number }[],
     loadNavigation: () => {},
-    user: { isLogin: boolean, nickName: string, uid: string }
+    user: { isLogin: boolean, nickName: string, uid: string },
+    product:{id:number}
 }> {
 
     componentWillMount() {
@@ -14,13 +15,13 @@ export class Header extends React.Component<{
     }
 
     render() {
-
+        const selectKeys = this.props.product && this.props.product.id && [this.props.product.id.toString()] || [];
         return (
             <div>
-                <Menu mode={'horizontal'}>
+                <Menu mode={'horizontal'} selectedKeys={selectKeys}>
                     {this.props.navigation.map((item)=>{
                         return (
-                            <Menu.Item key={item.link}><Link to={item.link}/>{item.text}</Menu.Item>
+                            <Menu.Item key={item.id}><Link to={item.link}/>{item.text}</Menu.Item>
                         );
                     })}
                 </Menu>

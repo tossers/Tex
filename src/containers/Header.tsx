@@ -4,13 +4,14 @@ import {inject, observer} from 'mobx-react';
 @inject((stores, props) => {
     return {
         ...props,
-        user:stores.userStore,
+        user: stores.userStore,
         navigation: stores.productStore.list.map((product) => {
-            return {text: product.name, link: `/product/${product.code}`};
+            return {text: product.name, link: `/product/${product.code}`, id: product.id};
         }),
         loadNavigation: () => {
             stores.productStore.loadProducts();
-        }
+        },
+        product: stores.productStore.current
     };
 })
 @observer

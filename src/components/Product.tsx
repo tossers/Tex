@@ -5,6 +5,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './Product.css';
 import {Entrust} from './Entrust';
+import {Card} from 'antd';
 
 export class Product extends React.Component<{
     match: match<{ id: number }>,
@@ -28,22 +29,25 @@ export class Product extends React.Component<{
     }
 
     render() {
-        const {product,entrust} = this.props;
+        const {product, entrust} = this.props;
         return (
             <div>
-                <h3>{this.props.product.name}({this.props.product.code})</h3>
-                <ReactGridLayout className="layout product" cols={12} rowHeight={30} width={this.state.width}>
-                    <div className="item" key="a" data-grid={{x: 0, y: 0, w: 4, h: 14}}>委托列表</div>
-                    <div className="item" key="b" data-grid={{x: 4, y: 0, w: 5, h: 14}}>图表</div>
-                    <div className="item" key="c" data-grid={{x: 9, y: 0, w: 3, h: 8}}>近期交易</div>
-                    <div className="item" key="order" data-grid={{x: 9, y: 6, w: 3, h: 6}}>
-                        <Entrust entrust={async (type: string, price: number, quantity: number) => {
-                            return entrust(type, product.id.toString(), price, quantity);
-                        }}/>
-                    </div>
-                    <div className="item" key="d" data-grid={{x: 0, y: 8, w: 9, h: 4}}>持有仓位</div>
-                    <div className="item" key="e" data-grid={{x: 9, y: 8, w: 3, h: 4}}>保证金</div>
-                </ReactGridLayout>
+                {/*<h3>{this.props.product.name}({this.props.product.code})</h3>*/}
+                {/*<Card title={`${this.props.product.name}(${this.props.product.code})`}>*/}
+                    <ReactGridLayout className="layout product" cols={12} rowHeight={36} width={this.state.width}>
+                        <Card className="item" title="委托列表" key="a" data-grid={{x: 0, y: 0, w: 4, h: 14}}>委托列表</Card>
+                        <Card className="item" title="图表" key="b" data-grid={{x: 4, y: 0, w: 5, h: 14}}>图表</Card>
+                        <Card className="item" title="近期交易" key="c" data-grid={{x: 9, y: 0, w: 3, h: 8}}>近期交易</Card>
+                        <Card className="item" title="委托" key="order" data-grid={{x: 9, y: 6, w: 3, h: 6}}>
+                            <Entrust entrust={async (type: string, price: number, quantity: number) => {
+                                return entrust(type, product.id.toString(), price, quantity);
+                            }}/>
+                        </Card>
+
+                        <Card className="item" title="持有仓位" key="d" data-grid={{x: 0, y: 8, w: 9, h: 4}}>持有仓位</Card>
+                        <Card className="item" title="保证金" key="e" data-grid={{x: 9, y: 8, w: 3, h: 4}}>保证金</Card>
+                    </ReactGridLayout>
+                {/*</Card>*/}
             </div>
         );
 
