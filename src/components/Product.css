@@ -1,7 +1,11 @@
 .product{
-    background-color: #eeeeee;
+    background-color: #f4f4f4;
     margin:0px auto;
 }
 .product .item{
     overflow: hidden;
+}
+
+.product .ant-card-body{
+    padding:4px;
 }

@@ -7,12 +7,22 @@
     text-align: center;
 }
 
+.entrust .ant-row:first-child{margin-top:20px;}
+
+.entrust .ant-btn:first-child{
+    margin-left:0px;
+}
+
+.entrust .ant-btn:last-child{
+    margin-right:0px;
+}
+
 .entrust .ant-btn{
     display: inline-block;
     margin:10px;
     height: 50px;
     line-height: 50px;
-    width: 80px;
+    width: 100px;
 }
 .entrust .ant-row:last-child{
     margin-bottom: 0px;

@@ -4,19 +4,19 @@ import {notification, Spin, Form, InputNumber, Button} from 'antd';
 
 const FormItem = Form.Item;
 
-export class Entrust extends React.Component<{ entrust: (type: string, price: number, quantity: number) => Promise<void> }, { spinning: boolean }> {
+export class Entrust extends React.Component<{ entrust: (type: string, price: number, quantity: number) => Promise<void> }, { spinning: boolean, price: number, quantity: number }> {
 
     state = {
-        spinning: false
+        spinning: false,
+        price: 0,
+        quantity: 0
     };
 
     entrust(type: string) {
         this.setState({
             spinning: true
         });
-        const price = Number((this.refs.price as HTMLInputElement).value);
-        const quantity = Number((this.refs.quantity as HTMLInputElement).value)
-        this.props.entrust(type, price, quantity).then(() => {
+        this.props.entrust(type, this.state.price, this.state.quantity).then(() => {
             notification.success({
                 message: '下单成功',
                 description: '下单成功'
@@ -49,44 +49,25 @@ export class Entrust extends React.Component<{ entrust: (type: string, price: nu
                         <FormItem
                             {...formItemLayout}
                             label="仓位">
-                            <InputNumber defaultValue={0} min={0} precision={3}
+                            <InputNumber defaultValue={this.state.quantity} min={0} precision={3}
                                          formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}/>
                         </FormItem>
                         <FormItem
                             {...formItemLayout}
                             label="价格">
                             <InputNumber formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                         defaultValue={0} min={0} precision={3}/>
+                                         defaultValue={this.state.price} min={0} precision={3}/>
                         </FormItem>
                         <FormItem>
-                            <Button type="primary" size="large">买入</Button>
-                            <Button type="danger" size="large">卖出</Button>
+                            <Button type="primary" size="large" onClick={(e) => {
+                                this.entrust('buy');
+                            }}>买入</Button>
+                            <Button type="danger" size="large" onClick={(e) => {
+                                this.entrust('sell');
+                            }}>卖出</Button>
                         </FormItem>
                     </Form>
                 </div>
-                {/*'"ghost" | "primary" | "dashed" | "danger" | undefined'*/}
-                {/*<div className="entrust">*/}
-                {/*<div className="item">*/}
-                {/*<span>价格</span><input type="number" ref={'price'} onMouseDown={(e) => e.stopPropagation()}*/}
-                {/*onMouseMove={(e) => e.stopPropagation()}/>*/}
-                {/*</div>*/}
-                {/*<div className="item">*/}
-                {/*<span>仓位</span><input type="number" ref={'quantity'} onMouseDown={(e) => e.stopPropagation()}*/}
-                {/*onMouseMove={(e) => e.stopPropagation()}/>*/}
-                {/*</div>*/}
-                {/*<div className="item">*/}
-                {/*<button onClick={(e) => {*/}
-                {/*this.entrust('buy');*/}
-                {/*e.stopPropagation();*/}
-                {/*}} onMouseDown={(e) => e.stopPropagation()}>买入*/}
-                {/*</button>*/}
-                {/*<button onClick={(e) => {*/}
-                {/*this.entrust('sell');*/}
-                {/*e.stopPropagation();*/}
-                {/*}} onMouseDown={(e) => e.stopPropagation()}>卖出*/}
-                {/*</button>*/}
-                {/*</div>*/}
-                {/*</div>*/}
             </Spin>
         );
 
