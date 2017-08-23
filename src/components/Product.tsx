@@ -33,8 +33,7 @@ export class Product extends React.Component<{
 
     componentWillReceiveProps(props: { product: { id: number } }) {
         if (this.props.product.id !== props.product.id) {
-            console.log('....',this.props.getEntrusts(props.product.id.toString()));
-            // this.props.getEntrusts(props.product.id.toString()).then(console.log).catch(console.error);
+            this.props.getEntrusts(props.product.id.toString());
         }
     }
 
