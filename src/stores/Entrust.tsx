@@ -1,4 +1,4 @@
-import {entrust, entrusts} from '../api/Index';
+import {entrust, entrusts,delEntrust} from '../api/Index';
 import {action, observable} from 'mobx';
 
 interface EntrustItems {
@@ -22,6 +22,11 @@ class Entrust {
         return entrusts(Number(productId)).then((list)=>{
             this.list = list;
         });
+    }
+
+    @action
+    async delEntrust(entrustId:number){
+        return delEntrust(entrustId);
     }
 
 }

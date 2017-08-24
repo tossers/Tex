@@ -14,7 +14,10 @@ import {inject, observer} from 'mobx-react';
         getEntrusts: async function (productId: string) {
             return stores.entrustStore.getEntrusts(productId);
         },
-        entrusts: stores.entrustStore.list
+        entrusts: stores.entrustStore.list,
+        delEntrust: async function(entrustId:number){
+            return stores.entrustStore.delEntrust(entrustId);
+        }
     };
 })
 @observer

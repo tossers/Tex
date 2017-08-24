@@ -50,10 +50,19 @@ export async function entrust(type: string, productId: string, price: number, qu
     });
 }
 
+export async function delEntrust(entrustId:number){
+    return axios.delete(`${orderUrl}/${entrustId}`,{headers:{
+        token
+    }}).catch((ex)=>{
+        throw new Error(ex.response.data);
+    });
+}
+
 export async function entrusts(productId: number) {
     return axios.get(orderUrl, {
         params: {
             token: token,
+            pageSize:12,
             filter: JSON.stringify({productId})
         }
     }).then((res) => {
