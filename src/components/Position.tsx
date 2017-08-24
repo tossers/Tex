@@ -68,7 +68,7 @@ export class Position extends React.Component<{
             title: '操作',
             dataIndex: 'operation',
             render: (text, record, index) => {
-                return (this.props.entrusts.length > 1 ? (
+                return (this.props.entrusts.length > 0 ? (
                     <Popconfirm title={`你确定要撤单?订单号:${record.id}`} onConfirm={() => {
                         this.onDelete(record,index);
                     }}><a href="#">撤单</a></Popconfirm>
