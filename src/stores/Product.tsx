@@ -1,5 +1,6 @@
 import {action, computed, observable} from 'mobx';
 import {getProducts} from '../api/Index';
+import {wsSubscribe,wsUnsubscribe} from '../api/WebSocket'
 
 export class Product {
     @observable id: number;
@@ -13,6 +14,9 @@ export class ProductList {
 
     @observable currentProductCode: string = '';
 
+    @observable line:{time:number,close:number,volume:number}[] = [];
+
+
     @action
     loadProducts() {
         getProducts().then((list) => {
@@ -25,6 +29,20 @@ export class ProductList {
         this.currentProductCode = productCode;
     }
 
+    @action subscribe(productId:number){
+        if(productId){
+            wsSubscribe(productId)
+
+        }
+    }
+
+    @action unSubscribe(productId:number){
+        if(productId){
+            wsUnsubscribe(productId);
+
+        }
+    }
+
     @computed
     get current() {
         const temp = this.list.filter((product) => product.code === this.currentProductCode);
@@ -33,6 +51,7 @@ export class ProductList {
         }
         return {};
     }
+
 }
 
 export default new ProductList();
