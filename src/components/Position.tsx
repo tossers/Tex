@@ -4,8 +4,8 @@ import * as React from 'react';
 const TabPane = Tabs.TabPane;
 
 export class Position extends React.Component<{
-    entrusts: { id: number, price: number; quantity: number }[]
-    onDeleteEntrust: (entrustId: number) => Promise<void>
+    entrusts: { id: number, price: number; quantity: number }[],
+    onDeleteEntrust: (entrustId: number) => Promise<void>,
     onUpdate:()=>void
 }, {spinning:boolean}> {
 

@@ -19,11 +19,14 @@ interface P {
 export class Product extends React.Component<{
     match: match<{ id: number }>,
     getProduct: (productCode: string) => {},
-    product: { name: string, id: number, code: string },
+    product: { name: string, id: number, code: string},
+    min: string[], trade: string[], orderBook: string[],
+    subscribe:(productId:number)=>void,
+    unSubscribe:(productId:number)=>void,
     entrust: (type: string, productId: string, price: number, quantity: number) => Promise<void>,
     entrusts: { id: number, price: number, quantity: number }[];
     getEntrusts: (productId: string) => Promise<void>;
-    delEntrust: (entrustId:number)=>Promise<void>;
+    delEntrust: (entrustId: number) => Promise<void>;
 
 }, { width: number, settings: { chart: P, entrustList: P, trading: P, entrust: P, position: P, bond: P } }> {
 
@@ -46,11 +49,13 @@ export class Product extends React.Component<{
     componentWillReceiveProps(props: { product: { id: number } }) {
         if (this.props.product.id !== props.product.id) {
             this.props.getEntrusts(props.product.id.toString());
+            this.props.unSubscribe(this.props.product.id);
+            this.props.subscribe(props.product.id);
         }
     }
 
     render() {
-        const {product, entrust, entrusts} = this.props;
+        const {product, entrust, entrusts,orderBook} = this.props;
         return (
             <ReactGridLayout autoSize={true} onLayoutChange={(layout) => {
                 var result: { [propName: string]: { [propName: string]: number } } = {};
@@ -60,7 +65,11 @@ export class Product extends React.Component<{
                 localStorage.settings = JSON.stringify(result);
             }} className="layout product" cols={12} rowHeight={36} width={this.state.width}>
                 <Card className="item" title="委托列表" key="entrustList"
-                      data-grid={this.state.settings.entrustList || {x: 0, y: 0, w: 4, h: 14}}>委托列表</Card>
+                      data-grid={this.state.settings.entrustList || {x: 0, y: 0, w: 4, h: 14}}>
+                    {(orderBook||[]).map((item,index)=>{
+                        return (<div key={item+index}>{item}</div>);
+                    })}
+                </Card>
                 <Card className="item" title="图表" key="chart"
                       data-grid={this.state.settings.chart || {x: 4, y: 0, w: 5, h: 14}}>图表</Card>
                 <Card className="item" title="近期交易" key="trading"
@@ -76,7 +85,7 @@ export class Product extends React.Component<{
 
                 <Card className="item" key="position"
                       data-grid={this.state.settings.position || {x: 0, y: 8, w: 9, h: 4}}>
-                    <Position entrusts={entrusts} onDeleteEntrust={this.props.delEntrust} onUpdate={()=>{
+                    <Position entrusts={entrusts} onDeleteEntrust={this.props.delEntrust} onUpdate={() => {
                         this.props.getEntrusts(this.props.product.id.toString());
                     }}/>
                 </Card>
