@@ -63,7 +63,7 @@ export async function entrusts(productId: number) {
         params: {
             token: token,
             pageSize:12,
-            filter: JSON.stringify({productId})
+            filter: JSON.stringify({productId,status:1})
         }
     }).then((res) => {
         return res.data.list;
