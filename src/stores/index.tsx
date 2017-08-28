@@ -1,15 +1,13 @@
 import userStore from './User';
 import productStore from './Product';
 import entrustStore from './Entrust';
-import transactionStore from './Transaction';
-import orderBookStore from './OrderBook';
-import chartStore from './Chart';
+import assetsStore from './Assects';
+import positionStore from './APosition';
 
 export default {
     userStore,
     productStore,
     entrustStore,
-    transactionStore,
-    chartStore,
-    orderBookStore,
+    assetsStore,
+    positionStore,
 };

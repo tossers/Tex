@@ -7,7 +7,7 @@
     text-align: center;
 }
 
-.entrust .ant-row:first-child{margin-top:20px;}
+.entrust .ant-row:first-child{margin-top:15px;}
 
 .entrust .ant-btn:first-child{
     margin-left:0px;
@@ -20,8 +20,8 @@
 .entrust .ant-btn{
     display: inline-block;
     margin:10px;
-    height: 50px;
-    line-height: 50px;
+    height: 40px;
+    line-height: 40px;
     width: 100px;
 }
 .entrust .ant-row:last-child{

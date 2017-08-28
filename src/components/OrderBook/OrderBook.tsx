@@ -1,19 +1,32 @@
 /**
  * Created by YCY on 2017/8/24.
  */
-import * as React from 'react'
-import {BuyTable} from './BuyTable'
+import * as React from 'react';
+import {BuyTable} from './BuyTable';
 // import {Icon} from 'antd'
 // import './OrderBook.css'
 
-export class OrderBook extends React.Component<{sellData, buyData}> {
+interface OneOrder{
+    key: [number, string];
+    price:number;
+    quantity:number;
+    total:number;
+    type:string;
+}
+
+export class OrderBook extends React.Component<{sellData: OneOrder[], buyData: OneOrder[]}> {
 
     render() {
         const {sellData, buyData} = this.props
         return (
             <div id="orderBook">
+                <div id="sellTable">
+                    <h3 style={{color: '#3e8654'}}>SELL:</h3>
+                    <BuyTable showHeader={true} dataSource={sellData}/>
+                </div>
                 <div id="buyTable">
-                    <BuyTable showHeader={true} dataSource={buyData}/>
+                    <h3 style={{color: '#ae543b'}}>BUY:</h3>
+                    <BuyTable showHeader={false} dataSource={buyData}/>
                 </div>
 
                 {/*<div className="betweenTables">*/}
@@ -38,11 +51,7 @@ export class OrderBook extends React.Component<{sellData, buyData}> {
                         {/*</a>*/}
                     {/*</div>*/}
                 {/*</div>*/}
-
-                <div id="sellTable">
-                    <BuyTable showHeader={false} dataSource={sellData}/>
-                </div>
             </div>
-        )
+        );
     }
 }

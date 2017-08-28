@@ -1,10 +1,19 @@
 import {Product as Component} from '../components/Product';
 import {inject, observer} from 'mobx-react';
-import {ws} from '../api/WebSocket'
 
 @inject((stores, props) => {
     return {
         ...props,
+        onWSReceiveOrder: stores.productStore.onWSReceiveOrder,
+        setOnWSReceiveOrderFalse: function(){
+            stores.productStore.setOnWSReceiveOrderFalse();
+        },
+        assets: stores.assetsStore.assets,
+        getUserAssets: function(){
+            stores.assetsStore.getUserAssets();
+        },
+
+        assetsId: stores.userStore.assetsId,
         getProduct: function (productCode: string) {
             stores.productStore.setCurrent(productCode);
         },
@@ -12,14 +21,8 @@ import {ws} from '../api/WebSocket'
         min:stores.productStore.min,
         orderBook:stores.productStore.orderBook,
         trade:stores.productStore.trade,
-        subscribe:(productId:number)=>{
-            stores.productStore.subscribe(productId);
-        },
-        unSubscribe:(productId:number)=>{
-            stores.productStore.unSubscribe(productId);
-        },
-        entrust: async function (type: string, productId: string, price: number, quantity: number) {
-            return stores.entrustStore.entrust(type, productId, price, quantity);
+        entrust: async function (type: string, productId: string, price: number, quantity: number, lever: number) {
+            return stores.entrustStore.entrust(type, productId, price, quantity, lever);
         },
         getEntrusts: async function (productId: string) {
             return stores.entrustStore.getEntrusts(productId);
@@ -29,26 +32,21 @@ import {ws} from '../api/WebSocket'
             return stores.entrustStore.delEntrust(entrustId);
         },
 
-        subscribe:(productId:number)=>{
-            stores.productStore.subscribe(productId);
+        subscribe:(productId:number, assetsId: number)=>{
+            stores.productStore.subscribe(productId, assetsId);
         },
         unSubscribe:(productId:number)=>{
-            stores.productStore.subscribe(productId);
+            return stores.productStore.unSubscribe(productId);
         },
-        transaction: stores.transactionStore.data,
-        getTransactionData: function (data) {
-            stores.transactionStore.getTransactionData(data)
+
+        //1.持仓列表； 2.获取持仓列表； 3.平仓操作；
+        positionDataSource: stores.positionStore.positionDataSource,
+        getPositionList: function () {
+            stores.positionStore.getPositionList();
         },
-        sellData: stores.orderBookStore.sellData,
-        buyData: stores.orderBookStore.buyData,
-        getOrderBook: function (data) {
-            stores.orderBookStore.getOrderBook(data)
+        deletePosition: function (id: number) {
+            return stores.positionStore.deletePosition(id);
         },
-        charData: stores.chartStore.charData,
-        getMinLine: function(data){
-            stores.chartStore.getMinLine(data)
-        },
-        ws: ws,
     };
 })
 

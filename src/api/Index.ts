@@ -5,6 +5,10 @@ const loginUrl: string = `${baseUrl}/user/login`;
 const productUrl: string = `${baseUrl}/product`;
 
 const orderUrl: string = `${baseUrl}/order`;
+//获取持仓列表接口
+const getPositionListUrl: string = `${baseUrl}/position`;
+//获取资金账户接口
+const userAssetsUrl: string = `${baseUrl}/userAssets/my`;
 
 import axios from 'axios';
 
@@ -16,7 +20,7 @@ export async function login(userName: string, passWord: string) {
         upass: passWord
     }).then((res) => {
         token = res.data.token;
-        return res.data.token;
+        return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);
     });
@@ -30,10 +34,10 @@ export async function getProducts() {
     });
 }
 
-export async function entrust(type: string, productId: string, price: number, quantity: number) {
+export async function entrust(type: string, productId: string, price: number, quantity: number, lever: number) {
     const orderType = type === 'buy' ? 1 : 2;
     return axios.post(orderUrl, {
-        lever: 1,
+        lever,
         orderType,
         price,
         quantity,
@@ -83,6 +87,64 @@ export async function getOrder(pageNum: string | number, pageSize: string | numb
         }
     }).then((res) => {
         return res.data.list;
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 获取持仓
+ * @param currPage //当前页码
+ * @param pageSize //单页条数
+ * @param filter   //字段过滤
+ * @param orderBy  //字段排序
+ * @returns {Promise<TResult|TResult2|TResult1>}
+ */
+export async function getPositionList(currPage?: number, pageSize?: number, filter?:string, orderBy?: string) {
+    return axios.get(getPositionListUrl, {
+        params: {
+            currPage,
+            pageSize,
+            filter,
+            orderBy,
+        },
+        headers: {
+            token
+        }
+    }).then((res) => {
+        return res.data.list;
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 平仓
+ * @param id   //持仓ID
+ * @returns {Promise<TResult|AxiosResponse>}
+ */
+export async function deletePosition(id: number) {
+    return axios.delete(getPositionListUrl+'/'+id, {
+        headers: {
+            token
+        }
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 获取用户资金信息
+ *
+ * @returns {Promise<TResult|TResult2|TResult1>}
+ */
+export async function getUserAssets() {
+    return axios.get(userAssetsUrl, {
+        headers: {
+            token
+        }
+    }).then((res) => {
+        return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);
     });

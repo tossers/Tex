@@ -1,52 +1,49 @@
-import {Table, Icon} from 'antd';
+import {Table} from 'antd';
 import * as React from 'react';
 // import './Transaction.css'
-export class Transaction extends React.Component<{dataSource}>{
+export interface RecentTrade{
+    price: number;
+    quantity: number;
+    time: string;
+    key: number;
+    direction: string;
+}
+
+export class Transaction extends React.Component<{dataSource: RecentTrade[]}>{
+
+    columnsRender = (text, record,) =>
+        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text}</span>)
 
     render() {
-        // const data: { key: number, price: number, quantity: number, time: string, direction: string }[] = [];
-        // for (let i = 0; i < 100; i++) {
-        //     data.push({
-        //         key: i,
-        //         price: i,
-        //         quantity: i,
-        //         time: new Date().toLocaleTimeString(),
-        //         direction: 'B'
-        //     });
-        // }
-
         const columns = [{
             title: '价格',
             dataIndex: 'price',
             key: 'price',
             width: '30%',
-            render: (text, record, index) =>
-                <span style={{color:  record.action  === 'SELL' ?'#ae543b': '#3e8654'}}>
-            <Icon style={{lineHeight: '0'}} type="arrow-down" />{text}</span>
+            render: this.columnsRender,
+
         },{
             title: '交易量',
             dataIndex: 'quantity',
             key: 'quantity',
             width: '30%',
-            render: (text, record, index) =>
-                <span style={{color:  record.action  === 'SELL' ?'#ae543b': '#3e8654'}}>{text}</span>
+            render: this.columnsRender,
         },{
             title: '时间',
             dataIndex: 'time',
             key: 'time',
             width: '30%',
-            render: (text, record, index) =>
-                <span style={{color:  record.action  === 'SELL' ?'#ae543b': '#3e8654'}}>{text}</span>
+            render: this.columnsRender,
         }, {
             title: '方向',
             dataIndex: 'direction',
             key: 'direction',
             width: '10%',
             render: (text, record, index) =>
-                record.action  === 'SELL' ?
-                    <span style={{color: '#ae543b'}}>S</span>
+                record.direction  === 'SELL' ?
+                    <span style={{color: '#3e8654'}}>S</span>
                     :
-                    <span style={{color: '#3e8654'}}>B</span>
+                    <span style={{color: '#ae543b'}}>B</span>
         }]
 
         return (

@@ -10,13 +10,16 @@ export class User {
 
     @observable nickName:string;
 
+    @observable assetsId: number;
+
     @action
     async login(userName: string, passWord: string) {
-        return login(userName, passWord).then((token: string) => {
+        return login(userName, passWord).then((data: {token: string; userAssetsId: number})  => {
             this.isLogin = true;
-            this.token = token;
-            this.uid = token;
-            this.nickName = token;
+            this.token = data.token;
+            this.uid = data.token;
+            this.nickName = data.token;
+            this.assetsId = data.userAssetsId;
         });
     }
 

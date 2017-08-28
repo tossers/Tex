@@ -6,6 +6,11 @@
     overflow: hidden;
 }
 
-.product .ant-card-body{
-    padding:4px;
+.product .ant-card-body {
+    padding: 4px;
+    height: calc(100% - 50px);
+}
+
+.product .assetSpan{
+    float: right
 }

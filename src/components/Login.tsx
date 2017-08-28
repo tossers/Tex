@@ -24,6 +24,7 @@ export class Login extends React.Component<{ location: Location, userStore: { lo
                 redirectToReferrer: true
             });
         } catch (ex) {
+            console.log(ex.stack);
             message.error(ex.message);
             this.setState({spinning:false});
         }
