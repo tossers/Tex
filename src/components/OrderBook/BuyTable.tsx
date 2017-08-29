@@ -4,7 +4,7 @@ import {Table} from 'antd';
 
 export class BuyTable extends React.Component<{
     dataSource: {
-        key: [number, string];
+        key: number;
         price: number;
         quantity: number;
         total: number;
@@ -42,6 +42,7 @@ export class BuyTable extends React.Component<{
 
         return (
             <Table
+                size="small"
                 dataSource={dataSource}
                 showHeader={showHeader}
                 bordered={true}

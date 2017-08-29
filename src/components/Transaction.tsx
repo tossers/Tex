@@ -9,7 +9,7 @@ export interface RecentTrade{
     direction: string;
 }
 
-export class Transaction extends React.Component<{dataSource: RecentTrade[]}>{
+export class Transaction extends React.Component<{dataSource: RecentTrade[], height: number}>{
 
     columnsRender = (text, record,) =>
         (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text}</span>)
@@ -44,18 +44,19 @@ export class Transaction extends React.Component<{dataSource: RecentTrade[]}>{
                     <span style={{color: '#3e8654'}}>S</span>
                     :
                     <span style={{color: '#ae543b'}}>B</span>
-        }]
+        }];
 
+        const {height, dataSource} = this.props;
         return (
-            <div id="Ttable">
-            <Table
-                showHeader={false}
-                columns={columns}
-                pagination={false}
-                dataSource={this.props.dataSource}
-                scroll={{ y: 300 }}
-                size="small"
-                bordered={true}/>
+            <div id="transaction_table">
+                <Table
+                    showHeader={false}
+                    columns={columns}
+                    pagination={false}
+                    dataSource={dataSource}
+                    scroll={{y: height * 62 - 70}}
+                    size="small"
+                    bordered={true}/>
             </div>
         );
     }

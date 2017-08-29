@@ -4,6 +4,8 @@ const loginUrl: string = `${baseUrl}/user/login`;
 
 const productUrl: string = `${baseUrl}/product`;
 
+const isLoginUrl : string = `${baseUrl}/user/checkToken`;
+
 const orderUrl: string = `${baseUrl}/order`;
 //获取持仓列表接口
 const getPositionListUrl: string = `${baseUrl}/position`;
@@ -14,12 +16,23 @@ import axios from 'axios';
 
 let token: string = '';
 
+export async function isLogin(){
+    const tempToken = localStorage.getItem('token');
+    return axios.get(isLoginUrl,{params:{token:tempToken}}).then((res)=>{
+        token = tempToken||'';
+        // console.log("===>",token);
+    }).catch((ex)=>{
+        throw new Error(ex.response.data);
+    });
+}
+
 export async function login(userName: string, passWord: string) {
     return axios.post(loginUrl, {
         uname: userName,
         upass: passWord
     }).then((res) => {
         token = res.data.token;
+        localStorage.setItem('token',token);
         return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);

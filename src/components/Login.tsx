@@ -4,7 +4,7 @@ import './Login.css';
 import {Location} from 'history';
 import {Form, Icon, Input, Button,Spin,message} from 'antd';
 
-export class Login extends React.Component<{ location: Location, userStore: { login: (userName: string, passWord: string) => Promise<void> } },
+export class Login extends React.Component<{ location: Location, userStore: { login: (userName: string, passWord: string) => Promise<void> , isLoginFn:()=>Promise<void>}, setIsLoginTrue: ()=>void },
     { redirectToReferrer: Boolean, userName: string, passWord: string, spinning: boolean }> {
 
     state = {
@@ -13,6 +13,16 @@ export class Login extends React.Component<{ location: Location, userStore: { lo
         passWord: '',
         spinning: false
     };
+
+    componentWillMount(){
+        this.props.userStore.isLoginFn().then(()=>{
+            this.setState({
+                redirectToReferrer: true
+            });
+        }).catch((ex)=>{
+            console.log(ex);
+        });
+    }
 
     async login() {
         this.setState({spinning:true});

@@ -1,7 +1,6 @@
-import {action, observable} from 'mobx';
+import {action, computed, observable} from 'mobx';
 import {deletePosition, getPositionList} from '../api/Index';
-import {PositionTableModel} from '../components/APosition';
-
+import {toFixed} from '../utils';
 //持仓
 interface PositionModel{
     averagePrice: number;  //均价
@@ -15,17 +14,13 @@ interface PositionModel{
 
 export class APosition {
 
-    @observable positionDataSource: PositionTableModel[] = [];
+    @observable list: PositionModel[] = [];
 
     //获取持仓列表
     @action
     async getPositionList() {
-        return getPositionList().then((data: PositionModel[])  => {
-            //为数据添加key属性，组件Table需要唯一key
-            const pData = data.map((item, index) => {
-                return Object.assign(item, {key: index});
-            });
-            this.positionDataSource = pData;
+        return getPositionList().then((data)  => {
+            this.list = data;
         });
     }
 
@@ -34,6 +29,15 @@ export class APosition {
     async deletePosition(id: number) {
         return deletePosition(id).then(() => {
             this.getPositionList();
+        });
+    }
+
+    @computed
+    get positionsDataSource() {
+        return this.list.map((item, index: number) => {
+            //为数据添加key属性，组件Table需要唯一key
+            let obj = toFixed(item as {});
+            return Object.assign(obj, {key: index});
         });
     }
 }

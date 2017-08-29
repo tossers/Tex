@@ -1,5 +1,6 @@
 import {action, computed, observable} from 'mobx';
 import {getProducts} from '../api/Index';
+import { timeFormat } from 'd3-time-format';
 
 export class Product {
     @observable id: number;
@@ -14,7 +15,7 @@ interface OneOrder {
     quantity: number;
     total: number;
     type: string;
-    key: [string, number];
+    key: string | number;
 }
 
 interface Orders {
@@ -42,6 +43,10 @@ interface Trade {
     time: string;
 }
 
+interface MinModel {
+    price: number;
+}
+
 export class ProductList {
     @observable list: Product[] = [];
 
@@ -54,6 +59,10 @@ export class ProductList {
     @observable trade: MTrade[] = [];
 
     @observable onWSReceiveOrder: boolean = false;
+
+    @observable lastPrice: number = 0;                      //分钟线的最新的价格
+
+    onRecFirstMin = true;                                   //收到第一条分钟线的标志
 
     isOnMessage: boolean = false;
 
@@ -86,7 +95,7 @@ export class ProductList {
     subscribe(productId: number, assetsId: number) {
         const subCmd = JSON.stringify({
             'op': 'subscribe',
-            args: [`orderBook:${productId}`, `trade:${productId}`, 'order']
+            args: [`orderBook:${productId}`, `trade:${productId}`, `min:${productId}`, 'order']
         });
 
         if (!this.ws) {
@@ -101,7 +110,7 @@ export class ProductList {
 
         if (!this.isOnMessage) {
             this.ws.onmessage = (evt) => {
-                console.log('receipt', JSON.parse(evt.data));
+                // console.log('receipt', JSON.parse(evt.data));
                 [].concat(JSON.parse(evt.data)).forEach(this.deal.bind(this));
             };
             this.isOnMessage = true;
@@ -111,12 +120,12 @@ export class ProductList {
     @action
     unSubscribe(productId: number) {
         if (this.ws) {
-            console.log('unSubscribe')
             this.ws.send(JSON.stringify({
                 'op': 'unsubscribe',
                 args: [`orderBook:${productId}`, `trade:${productId}`, `min:${productId}`, 'order']
             }));
         }
+        this.onRecFirstMin = true;                                      //重新获取第一条分钟线的最新价格
         this.min.splice(0, this.min.length);
         this.trade.splice(0, this.trade.length);
         this.orderBook.sellData.splice(0, this.orderBook.sellData.length);
@@ -135,12 +144,9 @@ export class ProductList {
             };
         };
         const mSort = (a, b) => (b.price - a.price);
-        let buyData = buy.map(deal('buy'));
-        let sellData = sell.map(deal('sell'));
-        this.orderBook = {
-            sellData: sellData.sort(mSort).splice(sellData.length-4, sellData.length-1),
-            buyData: buyData.sort(mSort).splice(0, 4)
-        };
+        let buyData = buy.map(deal('buy')).sort(mSort);
+        let sellData = sell.map(deal('sell')).sort(mSort);
+        this.orderBook = {sellData, buyData};
     }
 
     handleTrade(data: Trade[]) {
@@ -151,28 +157,38 @@ export class ProductList {
                 key: trade.length,
                 price: parseFloat(price.toFixed(4)),
                 quantity: parseFloat(quantity.toFixed(4)),
-                time: new Date(time).toLocaleTimeString(),
+                time: timeFormat('%H:%M:%S')(new Date(time)),
                 direction: entrustType,
             });
         });
         this.trade = trade.slice(0, 100);
     }
 
-    deal(msg: { cmd: string; data: Trade | Trade[] | OrderBook | OrderBook[] }): void {
+    deal(msg: { cmd: string; data: MinModel[] | Trade | Trade[] | OrderBook | OrderBook[] }): void {
         switch (msg.cmd) {
             case 'orderBook':
+                console.log('Book', msg.data);
                 const temp: OrderBook[] = (([] as OrderBook[]).concat(msg.data as OrderBook));
                 temp.forEach((item) => {
                     this.handleOrderBook(item);
                 });
                 break;
             case 'trade':
+                console.log('trade', msg.data);
                 const tradeTemp: Trade[] = (([] as Trade[]).concat(msg.data as Trade));
                 this.handleTrade(tradeTemp);
                 break;
             case 'order':
                 console.log('order', msg.data);
                 this.onWSReceiveOrder = true;
+                break;
+            case 'min':
+                console.log('min', msg.data);
+                const minTemp: MinModel[] = (([] as MinModel[]).concat(msg.data as MinModel));
+                if( this.onRecFirstMin && minTemp.length > 0){
+                    this.onRecFirstMin = false;
+                    this.lastPrice = minTemp[minTemp.length - 1].price;
+                }
                 break;
             default:
                 break;

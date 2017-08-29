@@ -1,5 +1,5 @@
 import {action, observable} from 'mobx';
-import {login} from '../api/Index';
+import {login,isLogin as isLoginFn} from '../api/Index';
 
 export class User {
     @observable isLogin: boolean = false;
@@ -20,6 +20,14 @@ export class User {
             this.uid = data.token;
             this.nickName = data.token;
             this.assetsId = data.userAssetsId;
+            localStorage.removeItem('settings');
+        });
+    }
+
+    @action
+    isLoginFn(){
+        return isLoginFn().then(()=>{
+            this.isLogin = true;
         });
     }
 

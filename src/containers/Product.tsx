@@ -4,6 +4,7 @@ import {inject, observer} from 'mobx-react';
 @inject((stores, props) => {
     return {
         ...props,
+        lastPrice: stores.productStore.lastPrice,                   //最新价格
         onWSReceiveOrder: stores.productStore.onWSReceiveOrder,
         setOnWSReceiveOrderFalse: function(){
             stores.productStore.setOnWSReceiveOrderFalse();
@@ -27,7 +28,7 @@ import {inject, observer} from 'mobx-react';
         getEntrusts: async function (productId: string) {
             return stores.entrustStore.getEntrusts(productId);
         },
-        entrusts: stores.entrustStore.list,
+        entrusts: stores.entrustStore.entrusDataSource,
         delEntrust: async function(entrustId:number){
             return stores.entrustStore.delEntrust(entrustId);
         },
@@ -40,7 +41,7 @@ import {inject, observer} from 'mobx-react';
         },
 
         //1.持仓列表； 2.获取持仓列表； 3.平仓操作；
-        positionDataSource: stores.positionStore.positionDataSource,
+        positionsDataSource: stores.positionStore.positionsDataSource,
         getPositionList: function () {
             stores.positionStore.getPositionList();
         },

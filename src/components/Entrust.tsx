@@ -4,22 +4,33 @@ import {Row, Col, notification, Spin, Form, InputNumber, Button, Slider} from 'a
 
 const FormItem = Form.Item;
 
-
-export class Entrust extends React.Component<{ entrust: (type: string,lever:number, price: number, quantity: number) => Promise<void> }, { spinning: boolean, price: number, quantity: number, lever: number }> {
+export class Entrust extends React.Component<{
+    lastPrice: number,              //最新价格
+    onUpdate: ()=> Promise<void>,
+    entrust: (type: string, price: number, quantity: number, lever:number,) => Promise<void> },
+    { spinning: boolean, price: number, quantity: number, lever: number }> {
 
     state = {
         spinning: false,
         price: 0,
-        quantity: 0,
+        quantity: 1,
         lever: 1,
-
     };
+
+    componentWillReceiveProps(props: {lastPrice: number}){
+        if(this.props.lastPrice !== props.lastPrice){
+            console.log('props.lastrice', props.lastPrice)
+            this.setState({price: props.lastPrice});
+        }
+    }
 
     entrust(type: string) {
         this.setState({
             spinning: true
         });
-        this.props.entrust(type, this.state.price, this.state.lever ,this.state.quantity).then(() => {
+        this.props.entrust(type, this.state.price, this.state.quantity, this.state.lever).then(()=>{
+            return this.props.onUpdate();
+        }).then(() => {
             notification.success({
                 message: '下单成功',
                 description: '下单成功'
@@ -36,16 +47,10 @@ export class Entrust extends React.Component<{ entrust: (type: string,lever:numb
         });
     }
 
+    updatePrice=(price:number)=>{
+        this.setState({price});
+    }
     render() {
-        // const marks = {
-        //     1: <span>x1</span>,
-        //     5: <span>x5</span>,
-        //     10: <span>x10</span>,
-        //     25: <span>x25</span>,
-        //     50: <span>x50</span>,
-        //     100: <span>x100</span>,
-        // };
-
         const formItemLayout = {
             labelCol: {
                 sm: {span: 6},
@@ -54,6 +59,7 @@ export class Entrust extends React.Component<{ entrust: (type: string,lever:numb
                 sm: {span: 16},
             },
         };
+
         return (
             <Spin spinning={this.state.spinning} tip="下单中">
                 <div onMouseDown={(e) => e.stopPropagation()} className="entrust">
@@ -72,9 +78,7 @@ export class Entrust extends React.Component<{ entrust: (type: string,lever:numb
                             {...formItemLayout}
                             label="价格">
                             <InputNumber formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                         defaultValue={this.state.price} min={0} precision={3} onChange={(value) => {
-                                this.setState({price: Number(value)});
-                            }}/>
+                                         value={this.state.price} step={0.001} min={0} precision={3} onChange={this.updatePrice}/>
                         </FormItem>
                         <FormItem style={{marginBottom: '0'}}>
                             <Row>

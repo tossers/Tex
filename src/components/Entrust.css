@@ -20,8 +20,8 @@
 .entrust .ant-btn{
     display: inline-block;
     margin:10px;
-    height: 40px;
-    line-height: 40px;
+    height: 64px;
+    line-height: 64px;
     width: 100px;
 }
 .entrust .ant-row:last-child{
