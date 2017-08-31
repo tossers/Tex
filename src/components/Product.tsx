@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as ReactGridLayout from 'react-grid-layout';
 import {match} from 'react-router-dom';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -9,6 +8,10 @@ import {Card} from 'antd';
 import {Position, PositionTableModel, EntrustTableModel} from './APosition';
 import {RecentTrade, Transaction} from './Transaction';
 import {OrderBook} from './OrderBook/OrderBook';
+import {config} from '../config';
+import {Responsive, WidthProvider} from 'react-grid-layout';
+const ResponsiveReactGridLayout = WidthProvider(Responsive)
+const {initLayouts} = config;
 interface OneOrder{
     price: number;
     quantity: number;
@@ -16,12 +19,7 @@ interface OneOrder{
     type: string;
     key: number;
 }
-interface P {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-}
+
 interface AssetsModel{
     availableassets: number;
     frozenassets: number;
@@ -59,16 +57,15 @@ export class Product extends React.Component<{
     orderBookHeight: number;
     positionHeight: number;
     transactionHeight: number,
-    width: number,
-    settings: { chart: P, entrustList: P, trading: P, entrust: P, position: P, bond: P } }> {
+    layouts: {md: {}[], sm: {}[], xs: {}[], xxs: {}[]},
+}> {
 
     state = {
         orderBookHeight: 5,
         transactionHeight: 4,
         positionHeight: 5,
-        width: 1300,
-        settings: {
-            ...(JSON.parse(localStorage.settings || '{}'))
+        layouts: {
+            ...(localStorage.layouts? JSON.parse(localStorage.layouts): initLayouts)
         }
     };
 
@@ -101,10 +98,14 @@ export class Product extends React.Component<{
 
     render() {
         const {product, entrust, entrusts, orderBook, trade, deletePosition, positionsDataSource, assets, lastPrice, getEntrusts, getUserAssets} = this.props;
+        const {layouts} = this.state;
         return (
-            <ReactGridLayout autoSize={true} onLayoutChange={(layout) => {
-                var result: { [propName: string]: { [propName: string]: number } } = {};
-                layout.forEach((item) => {
+            <ResponsiveReactGridLayout
+                layouts={layouts}
+                breakpoints={{md: 1000, sm: 780, xs: 450, xxs: 0}}
+                cols={{lg: 12, md: 12, sm: 12, xs: 12, xxs: 12}}
+                onLayoutChange={(currentLayout, allLayouts) => {
+                currentLayout.forEach((item) => {
                     if(item.i === 'trading'){
                         this.setState({transactionHeight: item.h});
                     }else if(item.i === 'position'){
@@ -112,24 +113,19 @@ export class Product extends React.Component<{
                     }else if(item.i === 'entrustList'){
                         this.setState({orderBookHeight: item.h});
                     }
-                    result[item.i] = item;
                 });
-                localStorage.settings = JSON.stringify(result);
-            }} className="layout product" cols={12} rowHeight={62 - 10} width={this.state.width}>
-                <Card className="item" title="委托列表" key="entrustList"
-                      data-grid={this.state.settings.entrustList || {x: 0, y: 0, w: 3, h: this.state.orderBookHeight, minH: 5}}>
+                localStorage.layouts = JSON.stringify(allLayouts);
+            }} className="layout product" rowHeight={62 - 10}>
+                <Card className="item" title="委托列表" key="entrustList" >
                     <OrderBook height={this.state.orderBookHeight} buyData={orderBook.buyData} sellData={orderBook.sellData} />
                 </Card>
-                <Card className="item" title="图表" key="chart"
-                      data-grid={this.state.settings.chart || {x: 3, y: 0, w: 6, h: 9}}>
+                <Card className="item" title="图表" key="chart">
                     <iframe style={{border: '0', width: '100%', height: '100%'}} src={'http://chart.tex.tuling.me/?productId=' + product.id} />
                 </Card>
-                <Card className="item" title="近期交易" key="trading"
-                      data-grid={this.state.settings.trading || {x: 9, y: 0, w: 3, h: this.state.transactionHeight}}>
+                <Card className="item" title="近期交易" key="trading" >
                     <Transaction dataSource={trade} height={this.state.transactionHeight}/>
                 </Card>
-                <Card className="item" title="委托" key="entrust"
-                      data-grid={this.state.settings.entrust || {x: 9, y: 4, w: 3, h: 5, minH: 5}}>
+                <Card className="item" title="委托" key="entrust">
                     <Entrust
                         lastPrice={lastPrice}
                         onUpdate={()=> getEntrusts(product.id.toString()).then(()=>getUserAssets())}
@@ -138,20 +134,17 @@ export class Product extends React.Component<{
                     }}/>
                 </Card>
 
-                <Card className="item" key="position"
-                      data-grid={this.state.settings.position || {x: 0, y: 9, w: 12, h: this.state.positionHeight}}>
+                <Card className="item" key="position" >
                     <Position
                         height={this.state.positionHeight}
                         deletePosition={deletePosition}
                         positionsDataSource={positionsDataSource}
                         entrusts={entrusts}
                         onDeleteEntrust={this.props.delEntrust}
-                        onUpdate={() => getEntrusts(product.id.toString())}
+                        onUpdate={()=> getEntrusts(product.id.toString()).then(()=>getUserAssets())}
                     />
                 </Card>
-
-                <Card className="item" title="保证金" key="bond"
-                      data-grid={this.state.settings.bond || {x: 0, y: 5, w: 3, h: 4}}>
+                <Card className="item" title="保证金" key="bond" >
                     <ul style={{padding: '16px'}}>
                         <li><span>用户ID:</span><span className="assetSpan">{assets.uid}</span></li>
                         <li><span>用户状态:</span><span className="assetSpan">{assets.status===1?'可用':'不可用'}</span></li>
@@ -160,7 +153,7 @@ export class Product extends React.Component<{
                         <li><span>冻结资金:</span><span className="assetSpan">{assets.frozenassets.toFixed(3)}</span></li>
                     </ul>
                 </Card>
-            </ReactGridLayout>
+            </ResponsiveReactGridLayout>
         );
 
     }

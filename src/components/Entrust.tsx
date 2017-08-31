@@ -19,7 +19,6 @@ export class Entrust extends React.Component<{
 
     componentWillReceiveProps(props: {lastPrice: number}){
         if(this.props.lastPrice !== props.lastPrice){
-            console.log('props.lastrice', props.lastPrice)
             this.setState({price: props.lastPrice});
         }
     }
@@ -54,9 +53,11 @@ export class Entrust extends React.Component<{
         const formItemLayout = {
             labelCol: {
                 sm: {span: 6},
+                xs: {span: 6},
             },
             wrapperCol: {
                 sm: {span: 16},
+                xs: {span: 16},
             },
         };
 
@@ -69,6 +70,7 @@ export class Entrust extends React.Component<{
                             label="仓位">
                             <InputNumber defaultValue={this.state.quantity} min={0} precision={3}
                                          formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                         step={0.001}
                                          onChange={(value) => {
                                              this.setState({quantity: Number(value)});
                                          }}/>

@@ -13,7 +13,6 @@ import {inject, observer} from 'mobx-react';
         getUserAssets: function(){
             stores.assetsStore.getUserAssets();
         },
-
         assetsId: stores.userStore.assetsId,
         getProduct: function (productCode: string) {
             stores.productStore.setCurrent(productCode);
@@ -21,7 +20,7 @@ import {inject, observer} from 'mobx-react';
         product: stores.productStore.current,
         min:stores.productStore.min,
         orderBook:stores.productStore.orderBook,
-        trade:stores.productStore.trade,
+        trade:stores.productStore.tradeDataSource,
         entrust: async function (type: string, productId: string, price: number, quantity: number, lever: number) {
             return stores.entrustStore.entrust(type, productId, price, quantity, lever);
         },

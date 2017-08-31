@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {Table} from 'antd';
-// import './BuyTable.css'
 
 export class BuyTable extends React.Component<{
     dataSource: {
@@ -24,13 +23,14 @@ export class BuyTable extends React.Component<{
                     <span style={{
                         fontWeight: 'bold',
                         color: record.type === 'buy' ? '#ae543b' : '#3e8654'
-                    }}>{text}</span>
+                    }}>{text.toFixed(3)}</span>
                 )
         }, {
             title: '数量',
             dataIndex: 'quantity',
             key: 'quantity',
             width: '33.33%',
+            render: (text, record, index) => <span>{text.toFixed(3)}</span>
         },
         //     {
         //     title: '总数',

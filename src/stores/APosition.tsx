@@ -1,6 +1,5 @@
 import {action, computed, observable} from 'mobx';
 import {deletePosition, getPositionList} from '../api/Index';
-import {toFixed} from '../utils';
 //持仓
 interface PositionModel{
     averagePrice: number;  //均价
@@ -36,8 +35,7 @@ export class APosition {
     get positionsDataSource() {
         return this.list.map((item, index: number) => {
             //为数据添加key属性，组件Table需要唯一key
-            let obj = toFixed(item as {});
-            return Object.assign(obj, {key: index});
+            return Object.assign(item, {key: index});
         });
     }
 }

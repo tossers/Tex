@@ -12,7 +12,7 @@ export interface RecentTrade{
 export class Transaction extends React.Component<{dataSource: RecentTrade[], height: number}>{
 
     columnsRender = (text, record,) =>
-        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text}</span>)
+        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text.toFixed(3)}</span>)
 
     render() {
         const columns = [{
@@ -33,7 +33,8 @@ export class Transaction extends React.Component<{dataSource: RecentTrade[], hei
             dataIndex: 'time',
             key: 'time',
             width: '30%',
-            render: this.columnsRender,
+            render: (text, record,) =>
+                (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text}</span>)
         }, {
             title: '方向',
             dataIndex: 'direction',

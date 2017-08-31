@@ -26,8 +26,9 @@ export class User {
 
     @action
     isLoginFn(){
-        return isLoginFn().then(()=>{
+        return isLoginFn().then((data: {userAssetsId: number})=>{
             this.isLogin = true;
+            this.assetsId = data.userAssetsId;
         });
     }
 

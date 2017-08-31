@@ -91,6 +91,9 @@ export class Position extends React.Component<{
         });
     }
 
+    //保留3三位小数
+    colRender = (text) => <span>{(text)? text.toFixed(3) : 0}</span>
+
     render() {
         //持仓列表column
         const positionCol = [{
@@ -113,28 +116,31 @@ export class Position extends React.Component<{
             dataIndex: 'position',
             key: 'position',
             width: '12.5%',
+            render: this.colRender,
         },{
             title: '均价',
             dataIndex: 'averagePrice',
             key: 'averagePrice',
             width: '12.5%',
+            render: this.colRender,
         },{
             title: '成本',
             dataIndex: 'cost',
             key: 'cost',
             width: '12.5%',
+            render: this.colRender,
         },{
             title: '持仓状态',
             dataIndex: 'status',
             key: 'status',
             width: '12.5%',
-            render: (text) => text === 1 ? <span>可用</span>: <span>不可用</span>,
+            render: (text) => text === 1 ? <span>可用</span>: <span>平仓中</span>,
         },{
             title: '操作',
             dataIndex: 'operation',
             width: '12.5%',
             render: (text, record, index) => {
-                return (record.position !== 0 ? (
+                return (record.status === 1 ? (
                     <Popconfirm title={`你确定要平仓?仓位数量:${record.position}`} onConfirm={() => {
                         this.onDeletePosition(record);
                     }}><a href="#">平仓</a></Popconfirm>
@@ -163,12 +169,16 @@ export class Position extends React.Component<{
             dataIndex: 'quantity',
             key: 'quantity',
             width: '7%',
-        }, {
-            title: '委托价格',
-            dataIndex: 'price',
-            key: 'price',
-            width: '7%',
-        }, {
+            render: this.colRender,
+        },
+        //     {
+        //     title: '委托价格',
+        //     dataIndex: 'price',
+        //     key: 'price',
+        //     width: '7%',
+        //     render: this.colRender,
+        // },
+            {
             title: '杠杆倍数',
             dataIndex: 'lever',
             key: 'lever',
@@ -178,16 +188,19 @@ export class Position extends React.Component<{
             dataIndex: 'turnover',
             key: 'turnover',
             width: '7%',
+            render: this.colRender,
         }, {
             title: '止损价格',
             dataIndex: 'stopLoss',
             key: 'stopLoss',
             width: '7%',
+            render: this.colRender,
         }, {
             title: '止盈价格',
             dataIndex: 'stopProfit',
             key: 'stopProfit',
             width: '7%',
+            render: this.colRender,
         }, {
             title: '订单方向',
             dataIndex: 'orderType',

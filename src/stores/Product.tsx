@@ -27,8 +27,7 @@ interface MTrade {
     price: number;
     quantity: number;
     time: string;
-    key: number;
-    direction: string;
+    entrustType: string;
 }
 
 interface OrderBook {
@@ -149,41 +148,44 @@ export class ProductList {
         this.orderBook = {sellData, buyData};
     }
 
-    handleTrade(data: Trade[]) {
-        let trade = this.trade.slice(0);
-        data.forEach((item) => {
+    @computed
+    get tradeDataSource(){
+        return this.trade.map((item, index) => {
             let {entrustType, price, quantity, time} = item;
-            trade.unshift({
-                key: trade.length,
-                price: parseFloat(price.toFixed(4)),
-                quantity: parseFloat(quantity.toFixed(4)),
+            return ({
+                key: index,
+                price,
+                quantity,
                 time: timeFormat('%H:%M:%S')(new Date(time)),
                 direction: entrustType,
             });
         });
-        this.trade = trade.slice(0, 100);
+    }
+
+    handleTrade(data: Trade[]) {
+        data.forEach((item) => {
+            this.trade.unshift(item);
+        });
+        this.trade = this.trade.slice(0, 100);
     }
 
     deal(msg: { cmd: string; data: MinModel[] | Trade | Trade[] | OrderBook | OrderBook[] }): void {
         switch (msg.cmd) {
             case 'orderBook':
-                console.log('Book', msg.data);
                 const temp: OrderBook[] = (([] as OrderBook[]).concat(msg.data as OrderBook));
                 temp.forEach((item) => {
                     this.handleOrderBook(item);
                 });
                 break;
             case 'trade':
-                console.log('trade', msg.data);
                 const tradeTemp: Trade[] = (([] as Trade[]).concat(msg.data as Trade));
                 this.handleTrade(tradeTemp);
                 break;
             case 'order':
-                console.log('order', msg.data);
                 this.onWSReceiveOrder = true;
                 break;
             case 'min':
-                console.log('min', msg.data);
+                // console.log('min', msg.data);
                 const minTemp: MinModel[] = (([] as MinModel[]).concat(msg.data as MinModel));
                 if( this.onRecFirstMin && minTemp.length > 0){
                     this.onRecFirstMin = false;

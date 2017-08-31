@@ -1,5 +1,4 @@
 import {entrust, entrusts, delEntrust} from '../api/Index';
-import {toFixed} from '../utils';
 import {action, computed, observable} from 'mobx';
 
 //委托单
@@ -45,8 +44,7 @@ class Entrust {
     get entrusDataSource(){
         return this.list.map((item, index: number) => {
             //为数据添加key属性，组件Table需要唯一key
-            let obj = toFixed(item as {});
-            return Object.assign(obj, {key: index});
+            return Object.assign(item, {key: index});
         });
     }
 
