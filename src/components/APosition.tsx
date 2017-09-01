@@ -72,9 +72,7 @@ export class Position extends React.Component<{
         this.setState({
             spinning: true
         });
-        this.props.onDeleteEntrust(record.id).then(() =>
-            this.props.onUpdate()
-        ).then(() => {
+        this.props.onDeleteEntrust(record.id).then(() => {
             notification.success({
                 message: '撤单请求已提交',
                 description: `订单号:${record.id} 撤单请求已提交`
@@ -88,7 +86,9 @@ export class Position extends React.Component<{
             this.setState({
                 spinning: false
             });
-        });
+        }).then(() =>
+            this.props.onUpdate()
+        );
     }
 
     //保留3三位小数

@@ -1,6 +1,5 @@
 import {Table} from 'antd';
 import * as React from 'react';
-// import './Transaction.css'
 export interface RecentTrade{
     price: number;
     quantity: number;
@@ -11,8 +10,7 @@ export interface RecentTrade{
 
 export class Transaction extends React.Component<{dataSource: RecentTrade[], height: number}>{
 
-    columnsRender = (text, record,) =>
-        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text.toFixed(3)}</span>)
+    columnsRender = (text, record,) => (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text.toFixed(3)}</span>);
 
     render() {
         const columns = [{

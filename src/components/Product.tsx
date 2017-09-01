@@ -12,6 +12,7 @@ import {config} from '../config';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive)
 const {initLayouts} = config;
+
 interface OneOrder{
     price: number;
     quantity: number;
@@ -81,6 +82,7 @@ export class Product extends React.Component<{
     }
 
     componentWillReceiveProps(props: { product: { id: number }, assetsId: number, onWSReceiveOrder: boolean}) {
+
         if(props.onWSReceiveOrder){
             this.props.setOnWSReceiveOrderFalse();
             this.props.getPositionList();
@@ -127,13 +129,13 @@ export class Product extends React.Component<{
                 </Card>
                 <Card className="item" title="委托" key="entrust">
                     <Entrust
+                        availableassets={assets.availableassets}
                         lastPrice={lastPrice}
                         onUpdate={()=> getEntrusts(product.id.toString()).then(()=>getUserAssets())}
                         entrust={async (type: string, price: number, quantity: number, lever: number) => {
                         return entrust(type, product.id.toString(), price, quantity, lever);
                     }}/>
                 </Card>
-
                 <Card className="item" key="position" >
                     <Position
                         height={this.state.positionHeight}

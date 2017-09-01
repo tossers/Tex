@@ -15,7 +15,6 @@ interface OneOrder{
 }
 
 export class OrderBook extends React.Component<{sellData: OneOrder[], buyData: OneOrder[], height: number}> {
-
     render() {
         let {sellData, buyData, height} = this.props;
         let len = sellData.length;

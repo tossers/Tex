@@ -1,7 +1,7 @@
 import {action, computed, observable} from 'mobx';
 import {getProducts} from '../api/Index';
 import { timeFormat } from 'd3-time-format';
-
+import {MyWebSocket} from '../api/MyWebSocket';
 export class Product {
     @observable id: number;
     @observable code: string;
@@ -65,6 +65,14 @@ export class ProductList {
 
     isOnMessage: boolean = false;
 
+    tradeBuffer: MTrade[] = [];
+
+    orderBookBuffer: Orders = {sellData: [], buyData: []};
+
+    timer;
+
+    start;
+
     ws;
 
     @action
@@ -98,19 +106,17 @@ export class ProductList {
         });
 
         if (!this.ws) {
-            const webSocketUrl: string = `ws://tex.tuling.me:8089/websocket?${assetsId}`;
-            this.ws = new WebSocket(webSocketUrl);
-            this.ws.onopen = () => {
-                this.ws.send(subCmd);
-            };
+            this.ws = new MyWebSocket().getInstance(assetsId, subCmd);
         } else {
             this.ws.send(subCmd);
         }
 
         if (!this.isOnMessage) {
             this.ws.onmessage = (evt) => {
+                // wsReconnect.reset();
                 // console.log('receipt', JSON.parse(evt.data));
                 [].concat(JSON.parse(evt.data)).forEach(this.deal.bind(this));
+                this.throttle(500, 2500);
             };
             this.isOnMessage = true;
         }
@@ -135,17 +141,17 @@ export class ProductList {
         const {buy, sell} = data;
         const deal = (type) => {
             return (item, index) => {
-                let jsonItem = JSON.parse(item);
-                const mPrice = parseFloat((jsonItem.price).toFixed(4));
-                const mQuantity = parseFloat((jsonItem.quantity).toFixed(4));
-                let total = parseFloat((mPrice * mQuantity).toFixed(4));
+                // let jsonItem = JSON.parse(item);
+                const mPrice = item.price;
+                const mQuantity = item.quantity;
+                let total = mPrice * mQuantity;
                 return ({key: type + index, type, price: mPrice, quantity: mQuantity, total});
             };
         };
         const mSort = (a, b) => (b.price - a.price);
         let buyData = buy.map(deal('buy')).sort(mSort);
         let sellData = sell.map(deal('sell')).sort(mSort);
-        this.orderBook = {sellData, buyData};
+        this.orderBookBuffer = {sellData, buyData};
     }
 
     @computed
@@ -164,9 +170,9 @@ export class ProductList {
 
     handleTrade(data: Trade[]) {
         data.forEach((item) => {
-            this.trade.unshift(item);
+            this.tradeBuffer.unshift(item);
         });
-        this.trade = this.trade.slice(0, 100);
+        this.tradeBuffer = this.tradeBuffer.splice(0, 100);
     }
 
     deal(msg: { cmd: string; data: MinModel[] | Trade | Trade[] | OrderBook | OrderBook[] }): void {
@@ -200,6 +206,30 @@ export class ProductList {
     @action
     setOnWSReceiveOrderFalse(){
         this.onWSReceiveOrder = false;
+    }
+
+    throttle(delay: number, applyTime: number){
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
+        let cur = Date.now();                   //记录当前时间
+
+        if (!this.start) {                      //若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
+            this.start = cur;
+        }
+
+        if (cur - this.start > applyTime) {
+            //当前时间与上一次函数被执行的时间作差，与mustApplyTime比较，若大于，则必须执行一次函数，若小于，则重新设置计时器
+            this.orderBook = this.orderBookBuffer;
+            this.trade = this.tradeBuffer;
+            this.start = cur;
+        } else {
+            this.timer = setTimeout(() => {
+                this.orderBook = this.orderBookBuffer;
+                this.trade = this.tradeBuffer;
+            }, delay);
+        }
     }
 }
 
