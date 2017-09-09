@@ -1,103 +1,74 @@
 import {action, computed, observable} from 'mobx';
 import {getProducts} from '../api/Index';
-import { timeFormat } from 'd3-time-format';
 import {MyWebSocket} from '../api/MyWebSocket';
-export class Product {
-    @observable id: number;
-    @observable code: string;
-    @observable name: string;
-    @observable status: number;
+import {OrderBookTableModel} from '../components/OrderBook';
+import {sortWithPrice} from '../util/index';
+import {ProductModel} from '../components/Product';
 
-}
-
-interface OneOrder {
+interface OrderModel {
+    time: number;
     price: number;
     quantity: number;
-    total: number;
-    type: string;
-    key: string | number;
 }
 
-interface Orders {
-    sellData: Array<OneOrder>;
-    buyData: Array<OneOrder>;
+interface OrderBookModel {
+    sell: OrderModel[];
+    buy: OrderModel[];
 }
 
-interface MTrade {
+interface TradeModel {
+    cancel: boolean;
+    entrustType: string;     //'BUY' or 'SELL'
+    fromID: string;
+    id: number;
     price: number;
+    product: string;
     quantity: number;
-    time: string;
-    entrustType: string;
+    time: number;
+    toID: string;
 }
 
-interface OrderBook {
-    sell: Array<OneOrder>;
-    buy: Array<OneOrder>;
-}
-
-interface Trade {
-    entrustType: string;
-    price: number;
-    quantity: number;
-    time: string;
-}
-
-interface MinModel {
+interface MinModel{
     price: number;
 }
 
 export class ProductList {
-    @observable list: Product[] = [];
-
-    @observable currentProductCode: string = '';
-
-    @observable orderBook: Orders = {sellData: [], buyData: []};
-
-    @observable min: string[] = [];
-
-    @observable trade: MTrade[] = [];
-
-    @observable onWSReceiveOrder: boolean = false;
-
-    @observable lastPrice: number = 0;                      //分钟线的最新的价格
-
-    onRecFirstMin = true;                                   //收到第一条分钟线的标志
-
-    isOnMessage: boolean = false;
-
-    tradeBuffer: MTrade[] = [];
-
-    orderBookBuffer: Orders = {sellData: [], buyData: []};
-
-    timer;
-
-    start;
-
-    ws;
-
+    @observable list: ProductModel[] = [];                                //产品列表
+    @observable currentProductCode: string = '';                          //当前选择的产品的代码
+    @observable orderBook: OrderBookModel = {sell: [], buy: []};          //盘口信息
+    @observable trade: TradeModel[] = [];                                 //最近交易
+    @observable onWSReceiveOrder: boolean = false;                        //WS接收到order的标志
+    @observable lastPrice: number = 0;                                    //分钟线的最新的价格
+    tradeBuffer: TradeModel[] = [];                                       //接收数据的节流buffer
+    orderBookBuffer: OrderBookModel = {sell: [], buy: []};                //接收数据的节流buffer
+    timer;                                                                //接收数据的节流lock
+    start;                                                                //接收数据的节流clock
+    ws;                                                                   //webSocket对象
+    isOnMessage: boolean = false;                                         //WSonMessage's lock
+    /**
+     * 获取产品列表
+     */
     @action
     loadProducts() {
         getProducts().then((list) => {
-            this.list = list.map((item) => {
-                return Object.assign(item, {min: [], orderBook: [], trade: []});
-            });
+            this.list = list;
         });
     }
 
+    /**
+     * 设置当前选择的产品的代码
+     * @param productCode
+     */
     @action
     setCurrent(productCode: string) {
         this.currentProductCode = productCode;
     }
 
-    @computed
-    get current() {
-        const temp = this.list.filter((product) => product.code === this.currentProductCode);
-        if (!!temp.length) {
-            return temp[0];
-        }
-        return {};
-    }
-
+    /**
+     * WS订阅
+     * @param productId
+     * @param assetsId
+     */
     @action
     subscribe(productId: number, assetsId: number) {
         const subCmd = JSON.stringify({
@@ -113,15 +84,16 @@ export class ProductList {
 
         if (!this.isOnMessage) {
             this.ws.onmessage = (evt) => {
-                // wsReconnect.reset();
-                // console.log('receipt', JSON.parse(evt.data));
                 [].concat(JSON.parse(evt.data)).forEach(this.deal.bind(this));
-                this.throttle(500, 2500);
             };
             this.isOnMessage = true;
         }
     }
 
+    /**
+     * WS取消订阅，清空数据
+     * @param productId
+     */
     @action
     unSubscribe(productId: number) {
         if (this.ws) {
@@ -130,82 +102,57 @@ export class ProductList {
                 args: [`orderBook:${productId}`, `trade:${productId}`, `min:${productId}`, 'order']
             }));
         }
-        this.onRecFirstMin = true;                                      //重新获取第一条分钟线的最新价格
-        this.min.splice(0, this.min.length);
+        this.tradeBuffer.splice(0, this.tradeBuffer.length);
         this.trade.splice(0, this.trade.length);
-        this.orderBook.sellData.splice(0, this.orderBook.sellData.length);
-        this.orderBook.buyData.splice(0, this.orderBook.sellData.length);
+        this.orderBookBuffer.sell.splice(0, this.orderBookBuffer.sell.length);
+        this.orderBookBuffer.buy.splice(0, this.orderBookBuffer.sell.length);
+        this.orderBook.sell.splice(0, this.orderBook.sell.length);
+        this.orderBook.buy.splice(0, this.orderBook.sell.length);
     }
 
-    handleOrderBook(data: OrderBook) {
-        const {buy, sell} = data;
-        const deal = (type) => {
-            return (item, index) => {
-                // let jsonItem = JSON.parse(item);
-                const mPrice = item.price;
-                const mQuantity = item.quantity;
-                let total = mPrice * mQuantity;
-                return ({key: type + index, type, price: mPrice, quantity: mQuantity, total});
-            };
-        };
-        const mSort = (a, b) => (b.price - a.price);
-        let buyData = buy.map(deal('buy')).sort(mSort);
-        let sellData = sell.map(deal('sell')).sort(mSort);
-        this.orderBookBuffer = {sellData, buyData};
+    /**
+     * 重置接收order的标志
+     */
+    @action
+    setOnWSReceiveOrderFalse(){
+        this.onWSReceiveOrder = false;
     }
 
-    @computed
-    get tradeDataSource(){
-        return this.trade.map((item, index) => {
-            let {entrustType, price, quantity, time} = item;
-            return ({
-                key: index,
-                price,
-                quantity,
-                time: timeFormat('%H:%M:%S')(new Date(time)),
-                direction: entrustType,
-            });
-        });
-    }
-
-    handleTrade(data: Trade[]) {
-        data.forEach((item) => {
-            this.tradeBuffer.unshift(item);
-        });
-        this.tradeBuffer = this.tradeBuffer.splice(0, 100);
-    }
-
-    deal(msg: { cmd: string; data: MinModel[] | Trade | Trade[] | OrderBook | OrderBook[] }): void {
+    /**
+     * 处理WS数据
+     * @param msg
+     */
+    deal(msg: { cmd: string; data: MinModel[] | TradeModel | TradeModel[] | OrderBookModel | OrderBookModel[] }): void {
         switch (msg.cmd) {
             case 'orderBook':
-                const temp: OrderBook[] = (([] as OrderBook[]).concat(msg.data as OrderBook));
-                temp.forEach((item) => {
-                    this.handleOrderBook(item);
+                const orderBookTemp: OrderBookModel[] = (([] as OrderBookModel[]).concat(msg.data as OrderBookModel));
+                orderBookTemp.forEach((item) => {
+                    const {buy, sell} = item;
+                    this.orderBookBuffer = {sell, buy};
                 });
                 break;
             case 'trade':
-                const tradeTemp: Trade[] = (([] as Trade[]).concat(msg.data as Trade));
-                this.handleTrade(tradeTemp);
+                const tradeTemp: TradeModel[] = (([] as TradeModel[]).concat(msg.data as TradeModel));
+                tradeTemp.forEach((item) => {
+                    this.tradeBuffer.unshift(item);
+                });
+                this.tradeBuffer = this.tradeBuffer.splice(0, 100);
                 break;
             case 'order':
                 this.onWSReceiveOrder = true;
                 break;
             case 'min':
-                // console.log('min', msg.data);
                 const minTemp: MinModel[] = (([] as MinModel[]).concat(msg.data as MinModel));
-                if( this.onRecFirstMin && minTemp.length > 0){
-                    this.onRecFirstMin = false;
-                    this.lastPrice = minTemp[minTemp.length - 1].price;
+                const currentProduct = this.list.find((product: ProductModel) => product.code === this.currentProductCode);
+                if(this.ws && currentProduct){
+                    this.ws.send(JSON.stringify({'op': 'unsubscribe', args: [ `min:${currentProduct.id}`]}));
                 }
+                this.lastPrice = minTemp.length>0? minTemp[minTemp.length - 1].price: 0;
                 break;
             default:
                 break;
         }
-    }
-
-    @action
-    setOnWSReceiveOrderFalse(){
-        this.onWSReceiveOrder = false;
+        this.throttle(500, 2500);
     }
 
     throttle(delay: number, applyTime: number){
@@ -221,9 +168,9 @@ export class ProductList {
 
         if (cur - this.start > applyTime) {
             //当前时间与上一次函数被执行的时间作差，与mustApplyTime比较，若大于，则必须执行一次函数，若小于，则重新设置计时器
+            this.start = cur;
             this.orderBook = this.orderBookBuffer;
             this.trade = this.tradeBuffer;
-            this.start = cur;
         } else {
             this.timer = setTimeout(() => {
                 this.orderBook = this.orderBookBuffer;
@@ -231,6 +178,55 @@ export class ProductList {
             }, delay);
         }
     }
+
+    /**
+     * 当前产品的信息
+     * @returns {any}
+     */
+    @computed
+    get current() {
+        const temp = this.list.filter((product) => product.code === this.currentProductCode);
+        if (!!temp.length) {
+            return temp[0];
+        }
+        return {};
+    }
+
+    /**
+     * 获取盘口信息组件Table的DataSource
+     * @returns {{sellData: OrderModel[], buyData: OrderModel[]}}
+     */
+    @computed
+    get orderBookDataSource(){
+        let {sell, buy} = this.orderBook;
+        let sellData: OrderBookTableModel[] = sell.map((item, index) => {
+            let type = 'SELL';
+            const {price, quantity} = item;
+            return ({key: type+index, type, price, quantity});
+        });
+
+        let buyData: OrderBookTableModel[] = buy.map((item, index) => {
+            let type = 'BUY';
+            const {price, quantity} = item;
+            return({key: type+index, type, price, quantity});
+        });
+        sellData = sellData.sort(sortWithPrice);
+        buyData = buyData.sort(sortWithPrice);
+        return {sellData, buyData};
+    }
+
+    /**
+     * 获取最近交易组件Table的DataSource
+     * @returns {[{key: number, price: number, quantity: number, time: any, direction: string},{key: number, price: number, quantity: number, time: any, direction: string},{key: number, price: number, quantity: number, time: any, direction: string},{key: number, price: number, quantity: number, time: any, direction: string},{key: number, price: number, quantity: number, time: any, direction: string}]}
+     */
+    @computed
+    get tradeDataSource(){
+        return this.trade.map((item, index) => {
+            const {price, quantity, time, entrustType} = item;
+            return {key: index, direction: entrustType, quantity, price, time};
+        });
+    }
+
 }
 
 export default new ProductList();

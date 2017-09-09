@@ -4,8 +4,19 @@ import './Login.css';
 import {Location} from 'history';
 import {Form, Icon, Input, Button,Spin,message} from 'antd';
 
-export class Login extends React.Component<{ location: Location, userStore: { login: (userName: string, passWord: string) => Promise<void> , isLoginFn:()=>Promise<void>}, setIsLoginTrue: ()=>void },
-    { redirectToReferrer: Boolean, userName: string, passWord: string, spinning: boolean }> {
+export class Login extends React.Component<{
+        location: Location,
+        userStore: {
+            login: (userName: string, passWord: string) => Promise<void> ,
+            isLoginFn:()=>Promise<void>
+        },
+        setIsLoginTrue: ()=>void
+    }, {
+        redirectToReferrer: Boolean,
+        userName: string,
+        passWord: string,
+        spinning: boolean
+    }> {
 
     state = {
         redirectToReferrer: false,
@@ -27,9 +38,11 @@ export class Login extends React.Component<{ location: Location, userStore: { lo
     async login() {
         this.setState({spinning:true});
         try {
-            const userName = this.state.userName;
-            const userPass = this.state.passWord;
-            await this.props.userStore.login(userName, userPass);
+            const {userName, passWord} = this.state;
+            // const {login} = this.props.userStore;
+            // await login(userName, passWord);
+
+            await this.props.userStore.login(userName, passWord);
             this.setState({
                 redirectToReferrer: true
             });
@@ -42,7 +55,6 @@ export class Login extends React.Component<{ location: Location, userStore: { lo
     }
 
     render() {
-
         const {from} = this.props.location.state || {from: {pathname: '/'}};
         const {redirectToReferrer} = this.state;
         if (redirectToReferrer) {

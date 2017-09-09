@@ -11,6 +11,21 @@
     height: calc(100% - 50px);
 }
 
-.product .assetSpan{
-    float: right
+.product .ant-card-head-title{
+    width: 100%;
+}
+
+.product .detailHeader{
+    display: inline-block;
+    float: right;
+    line-height: 1.5;
+    margin-right: 20px;
+}
+
+.product .detailHeader>div:nth-child(1){
+    color: #b5b9b9;
+}
+.product .detailHeader .numberFont{
+    font-size: 18px;
+    /*font-weight: bold;*/
 }

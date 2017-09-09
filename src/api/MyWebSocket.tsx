@@ -1,15 +1,21 @@
 import {notification} from 'antd';
-
+const webSocketUrl: string = `ws://tex.tuling.me:8099/websocket?`;
 // const webSocketUrl: string = window.location.host.indexOf('localhost')<0 ?
 //     `ws://tex.tuling.me:8089/websocket?` :
 //     `ws://127.0.0.1:8089/websocket?`
 // ;
-const webSocketUrl: string = `ws://tex.tuling.me:8089/websocket?`;
+
 // readyState
 // 0        CONNECTING        连接尚未建立
-// 1        OPEN            WebSocket的链接已经建立
-// 2        CLOSING            连接正在关闭
+// 1        OPEN              WebSocket的链接已经建立
+// 2        CLOSING           连接正在关闭
 // 3        CLOSED            连接已经关闭或不可用
+const enum ReadyState{
+    CONNECTING,
+    OPEN,
+    CLOSING,
+    CLOSED,
+}
 
 export class MyWebSocket{
     assetsId: number;
@@ -51,10 +57,10 @@ export class MyWebSocket{
                 message: 'WebSocket',
                 description: 'WebSocket重连中',
                 placement: 'bottomRight',
-                duration: 99999999
+                duration: null
             });
             let cycle = setInterval(() => {
-                if(this.instance.readyState === 1 || this.instance.readyState === 2){
+                if(this.instance.readyState === ReadyState.CONNECTING || this.instance.readyState === ReadyState.OPEN){
                     clearInterval(cycle);
                     this.lock = true;
                     notification.close('wsReconnecting');
@@ -62,12 +68,12 @@ export class MyWebSocket{
                         message: 'WebSocket',
                         description: 'WebSocket重连成功',
                         placement: 'bottomRight',
-                        duration: 4
+                        duration: 5
                     });
                 }else{
                     this.connect();
                 }
-            }, 8000);
+            }, 10000);
         }
     }
 }

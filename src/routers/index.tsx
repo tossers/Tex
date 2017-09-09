@@ -14,7 +14,7 @@ export default class AppRouter extends React.Component {
                 <Router>
                     <div style={{fontFamily:'consolas,微软雅黑'}}>
                         <Route path="/" component={Header}/>
-                            <Route path="/login" component={Login}/>
+                        <Route path="/login" component={Login}/>
                         <div>
                             <PrivateRoute path="/product/:id" component={Product}/>
                         </div>

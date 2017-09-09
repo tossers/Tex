@@ -4,6 +4,12 @@ import {inject, observer} from 'mobx-react';
 @inject((stores, props) => {
     return {
         ...props,
+        ordersTotal: stores.dealOrderStore.total,                   //总数
+        getDealOrders: function(page: number, size: number){                                  //获取成交单
+            return stores.dealOrderStore.getDealOrders(page, size);
+        },
+        dealOrders: stores.dealOrderStore.dealOrderDataSource,      //成交单
+        products: stores.productStore.list,
         lastPrice: stores.productStore.lastPrice,                   //最新价格
         onWSReceiveOrder: stores.productStore.onWSReceiveOrder,
         setOnWSReceiveOrderFalse: function(){
@@ -19,13 +25,13 @@ import {inject, observer} from 'mobx-react';
         },
         product: stores.productStore.current,
         min:stores.productStore.min,
-        orderBook:stores.productStore.orderBook,
+        orderBook:stores.productStore.orderBookDataSource,
         trade:stores.productStore.tradeDataSource,
         entrust: async function (type: string, productId: string, price: number, quantity: number, lever: number) {
             return stores.entrustStore.entrust(type, productId, price, quantity, lever);
         },
-        getEntrusts: async function (productId: string) {
-            return stores.entrustStore.getEntrusts(productId);
+        getEntrusts: function(){
+            stores.entrustStore.getEntrusts();
         },
         entrusts: stores.entrustStore.entrusDataSource,
         delEntrust: async function(entrustId:number){

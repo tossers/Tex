@@ -2,48 +2,70 @@ import {entrust, entrusts, delEntrust} from '../api/Index';
 import {action, computed, observable} from 'mobx';
 
 //委托单
-interface EntrustItems {
-    stopLoss: number;      //止损价格
-    stopProfit: number;    //止盈价格
-    orderType: number;     //订单方向----> BUY,SELL,SHORT,COVER分别用1,2,3,4表示
-    userAssetsId: number;  //用户资金id
-    price: number;         //委托价格
-    productId: number;     //产品id
-    lever: number;         //杠杆倍数
-    quantity: number;      //数量
-    orderMethod: number;   //订单类型----> 1 下单 2 撤单 3 平仓(非必传)
-    turnover: number;      //成交额
-    id: number;            //订单id
-    status: number;        //订单状态，1为可用
-    createdTime: string;   //订单时间
+interface EntrustModel {
+    action: number;           //订单类型----> 1 下单 2 撤单 -1 平仓(非必传)
+    assetsId: number;	      //用户资金账户(非必传)
+    bond:	number;           //下单保证金 可不传
+    createdAt: number;        //订单时间（非必传）
+    id: number;               //委托单ID
+    lever: number;	          //杠杆倍数（必传，且倍数必须为大于1的整数）
+    modifiedAt: number;       //最后修正时间,默认创建时间
+    orderId: string;          //订单id md5(用户资金id+时间戳+产品id) 16位
+    price: number;            //委托价格（必传，且价格必须大于0）
+    productId: number;        //产品id
+    quantity: number;         //数量
+    residue: number;          //剩余仓位 如果剩余仓位为0,表示该订单已完全成交
+    type: number;             //订单方向（必传）----> BUY,SELL,SHORT,COVER分别用1,2,3,4表示
 }
 
 class Entrust {
 
     @observable
-    list: EntrustItems[] = [];
+    list: EntrustModel[] = [];   //委托列表
 
+    /**
+     * 下单操作
+     * @param type
+     * @param productId
+     * @param price
+     * @param quantity
+     * @param lever
+     * @returns {Promise<Promise<TResult|TResult2|TResult1>>}
+     */
     @action
     async entrust(type: string, productId: string, price: number, quantity: number, lever: number) {
         return entrust(type, productId, price, quantity, lever);
     }
 
+    /**
+     * 获取委托列表
+     * @param productId
+     * @returns {Promise<TResult2|TResult1>}
+     */
     @action
-    async getEntrusts(productId: string) {
-        return entrusts(Number(productId)).then((list)=>{
+    async getEntrusts() {
+        return entrusts().then((list)=>{
             this.list = list;
         });
     }
 
+    /**
+     * 撤单操作
+     * @param entrustId
+     * @returns {Promise<Promise<TResult|AxiosResponse>>}
+     */
     @action
     async delEntrust(entrustId:number){
         return delEntrust(entrustId);
     }
 
+    /**
+     * 为数据添加key属性，组件Table需要唯一key
+     * @returns {[(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number})]}
+     */
     @computed
     get entrusDataSource(){
         return this.list.map((item, index: number) => {
-            //为数据添加key属性，组件Table需要唯一key
             return Object.assign(item, {key: index});
         });
     }

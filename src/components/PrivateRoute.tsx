@@ -18,8 +18,14 @@ export class PrivateRoute extends React.Component<PrivateProps, {}> {
     render() {
         let {component: Component, userStore, ...rest} = this.props;
         return (
-            <Route {...rest} render={props => (userStore && userStore.isLogin ? (<Component {...props}/>) : (
-                <Redirect to={{pathname: '/login', state: {from: props.location}}}/>))}/>
+            <Route {...rest}
+                render={
+                    props => (
+                        userStore && userStore.isLogin ?
+                            (<Component {...props}/>) :
+                            (<Redirect to={{pathname: '/login', state: {from: props.location}}}/>)
+                    )}
+            />
         );
     }
 }

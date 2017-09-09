@@ -1,16 +1,20 @@
-import {Table} from 'antd';
+import {Table, Tooltip} from 'antd';
 import * as React from 'react';
-export interface RecentTrade{
+import {toFixed} from '../util/index';
+import { timeFormat } from 'd3-time-format';
+
+export interface RecentTradeTableModel{
     price: number;
     quantity: number;
-    time: string;
+    time: number;
     key: number;
     direction: string;
 }
 
-export class Transaction extends React.Component<{dataSource: RecentTrade[], height: number}>{
+export class Transaction extends React.Component<{dataSource: RecentTradeTableModel[], height: number}>{
 
-    columnsRender = (text, record,) => (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text.toFixed(3)}</span>);
+    columnsRender = (text, record,) =>
+        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{toFixed(text, 3)}</span>)
 
     render() {
         const columns = [{
@@ -31,8 +35,12 @@ export class Transaction extends React.Component<{dataSource: RecentTrade[], hei
             dataIndex: 'time',
             key: 'time',
             width: '30%',
-            render: (text, record,) =>
-                (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{text}</span>)
+            render: (text, record) =>
+                (
+                    <Tooltip placement="left" title={new Date(text).toLocaleDateString()}>
+                        <span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{timeFormat('%H:%M:%S')(new Date(text))}</span>
+                    </Tooltip>
+                )
         }, {
             title: '方向',
             dataIndex: 'direction',

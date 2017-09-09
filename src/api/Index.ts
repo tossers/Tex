@@ -17,8 +17,68 @@ const getPositionListUrl: string = `${baseUrl}/position`;           //获取持�
 
 const userAssetsUrl: string = `${baseUrl}/userAssets/my`;           //获取资金账户接口
 
+const adjustLeverageUrl: string = `${baseUrl}/position/leverage`;   //调整杠杆
+
+const adjustBondUrl: string = `${baseUrl}/position/transferMargin`; //调整保证金
+
+const dealOrderUrl: string = `${baseUrl}/dealOrder`; //调整保证金
+
 let lock: boolean = true;
+
 let token: string = '';
+
+/**
+ * 获取成交单
+ * @param page
+ * @param size
+ * @returns {Promise<TResult|TResult2|TResult1>}
+ */
+export async function getDealOrders(page: number, size: number){
+    return axios.get(`${dealOrderUrl}/${page}/${size}`,{
+        validateStatus,
+        headers: {
+            token: token
+        }
+    }).then((res)=>{
+        return res.data;
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 调整保证金
+ * @param productId
+ * @param amount
+ * @returns {Promise<TResult|AxiosResponse>}
+ */
+export async function postBond(productId: number, amount: number) {
+    return axios.patch(`${adjustBondUrl}/${productId}/${amount}`, {}, {
+        validateStatus,
+        headers: {
+            token: token
+        }
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 调整杠杆
+ * @param productId
+ * @param lever
+ * @returns {Promise<TResult|AxiosResponse>}
+ */
+export async function patchLeverage(productId: number, lever: number) {
+    return axios.patch(`${adjustLeverageUrl}/${productId}/${lever}`, {}, {
+        validateStatus,
+        headers: {
+            token: token
+        }
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
 
 const validateStatus = (status) => {
     if(status === 401){
@@ -60,7 +120,7 @@ export async function login(userName: string, passWord: string) {
 
 export async function getProducts() {
     return axios.get(productUrl).then((res) => {
-        return res.data.list;
+        return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);
     });
@@ -70,11 +130,10 @@ export async function entrust(type: string, productId: string, price: number, qu
     const orderType = type === 'buy' ? 1 : 2;
     return axios.post(orderUrl, {
         lever,
-        orderType,
+        type: orderType,
         price,
         quantity,
         productId,
-        status: 1
     }, {
         validateStatus,
         headers: {
@@ -95,13 +154,12 @@ export async function delEntrust(entrustId:number){
     });
 }
 
-export async function entrusts(productId: number) {
+export async function entrusts() {
     return axios.get(orderUrl, {
         validateStatus,
         params: {
             token: token,
             pageSize:12,
-            filter: JSON.stringify({productId})
         }
     }).then((res) => {
         return res.data.list;
@@ -148,7 +206,7 @@ export async function getPositionList(currPage?: number, pageSize?: number, filt
             token
         }
     }).then((res) => {
-        return res.data.list;
+        return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);
     });

@@ -7,7 +7,7 @@ const FormItem = Form.Item;
 export class Entrust extends React.Component<{
     availableassets: number         //用户资金
     lastPrice: number,              //最新价格
-    onUpdate: ()=> Promise<void>,
+    onUpdate: ()=> void,
     entrust: (type: string, price: number, quantity: number, lever:number,) => Promise<void> },
     { spinning: boolean, price: number, quantity: number, lever: number}> {
 
@@ -46,7 +46,7 @@ export class Entrust extends React.Component<{
                 spinning: false
             });
         }).then(()=>{
-            return this.props.onUpdate();
+            this.props.onUpdate();
         });
     }
 
@@ -82,15 +82,14 @@ export class Entrust extends React.Component<{
                 xs: {span: 16},
             },
         };
-        const {availableassets} = this.props;
+        // const {availableassets} = this.props;
         let {quantity, price, lever, spinning} = this.state;
-        const rate = quantity * price / lever / availableassets * 100;
+        // const rate = quantity * price / lever / availableassets * 100;
         return (
             <Spin spinning={spinning} tip="下单中">
                 <div onMouseDown={(e) => e.stopPropagation()} className="entrust">
                     <Form>
                         <FormItem
-                            style={{marginBottom: '0'}}
                             {...formItemLayout}
                             label="仓位">
                             <InputNumber value={quantity} min={0} precision={3}
@@ -98,38 +97,38 @@ export class Entrust extends React.Component<{
                                          step={0.001}
                                          onChange={this.updateQuntity}/>
                         </FormItem>
-                        <Row style={{marginBottom: '10px'}}>
-                            <Col style={{paddingRight: '4px', textAlign: 'right', lineHeight: '2.5'}} span={6}>
-                                <span>比率：</span>
-                            </Col>
-                            <Col span={11}>
-                                <Slider
-                                    min={0.01}
-                                    step={0.01}
-                                    max={100}
-                                    tipFormatter={(value) => Number(value).toFixed(2) + '%'}
-                                    value={rate}
-                                    onChange={(value)=>{
-                                        this.setState({
-                                            quantity:((Number(value)/100) * availableassets) * lever
-                                        });
-                                    }}
-                                />
-                            </Col>
-                            <Col span={5}>
-                                <InputNumber
-                                    min={0.01}
-                                    max={100}
-                                    formatter={(value) =>  Number(value).toFixed(2) +'%'}
-                                    value={rate}
-                                    onChange={(value)=>{
-                                        this.setState({
-                                            quantity:((Number(value)/100) * availableassets) * lever
-                                        });
-                                    }}
-                                />
-                            </Col>
-                        </Row>
+                        {/*<Row style={{marginBottom: '10px'}}>*/}
+                            {/*<Col style={{paddingRight: '4px', textAlign: 'right', lineHeight: '2.5'}} span={6}>*/}
+                                {/*<span>比率：</span>*/}
+                            {/*</Col>*/}
+                            {/*<Col span={11}>*/}
+                                {/*<Slider*/}
+                                    {/*min={0.01}*/}
+                                    {/*step={0.01}*/}
+                                    {/*max={100}*/}
+                                    {/*tipFormatter={(value) => Number(value).toFixed(2) + '%'}*/}
+                                    {/*value={rate}*/}
+                                    {/*onChange={(value)=>{*/}
+                                        {/*this.setState({*/}
+                                            {/*quantity:((Number(value)/100) * availableassets) * lever*/}
+                                        {/*});*/}
+                                    {/*}}*/}
+                                {/*/>*/}
+                            {/*</Col>*/}
+                            {/*<Col span={5}>*/}
+                                {/*<InputNumber*/}
+                                    {/*min={0.01}*/}
+                                    {/*max={100}*/}
+                                    {/*formatter={(value) =>  Number(value).toFixed(2) +'%'}*/}
+                                    {/*value={rate}*/}
+                                    {/*onChange={(value)=>{*/}
+                                        {/*this.setState({*/}
+                                            {/*quantity:((Number(value)/100) * availableassets) * lever*/}
+                                        {/*});*/}
+                                    {/*}}*/}
+                                {/*/>*/}
+                            {/*</Col>*/}
+                        {/*</Row>*/}
                         <FormItem
                             style={{marginBottom: '0'}}
                             {...formItemLayout}

@@ -1,0 +1,17 @@
+.myBtnGroup .ant-btn-group > .ant-btn{
+    width: 50%;
+    height: 50px;
+    font-size: 16px;
+}
+
+.myBtnGroup .ant-modal-footer{
+    padding: 0;
+}
+
+.myBtnGroup .ant-modal-footer{
+    padding: 0;
+}
+
+.myBtnGroup .ant-btn-group{
+    width: 100%
+}
