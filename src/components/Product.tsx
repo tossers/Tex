@@ -90,7 +90,7 @@ export class Product extends React.Component<{
     }
 
     onLayoutChange = (currentLayout, allLayouts) => {
-        console.log('onLayoutChange');
+        // console.log('onLayoutChange');
         this.props.setCardHeight(currentLayout);
         localStorage.layouts = JSON.stringify(allLayouts);
     }
