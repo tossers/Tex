@@ -13,15 +13,18 @@ interface PositionModel{
 
 export class APosition {
     @observable list: PositionModel[] = [];     //持仓列表
+    @observable loading: boolean = false;
 
     /**
      * 获取持仓列表
      * @returns {Promise<TResult2|TResult1>}
      */
     @action
-    async getPositionList() {
-        return getPositionList().then((data)  => {
+    getPositionList() {
+        this.loading = true;
+        getPositionList().then((data)  => {
             this.list = data;
+            this.loading = false;
         });
     }
 
@@ -32,7 +35,10 @@ export class APosition {
      */
     @action
     async deletePosition(id: number) {
-        return deletePosition(id);
+        this.loading = true;
+        return deletePosition(id).then(() => {
+            this.loading = false;
+        });
     }
 
     /**

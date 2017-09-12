@@ -15,7 +15,7 @@ export class User {
     @action
     async login(userName: string, passWord: string) {
         return login(userName, passWord).then((data: {token: string; userAssetsId: number})  => {
-            console.log('this', this)
+            // console.log('this', this)
             this.isLogin = true;
             this.token = data.token;
             this.uid = data.token;

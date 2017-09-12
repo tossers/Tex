@@ -1,6 +1,6 @@
 import {Table, Tooltip} from 'antd';
 import * as React from 'react';
-import {toFixed} from '../util/index';
+import {toFixed} from '../../util/index';
 import { timeFormat } from 'd3-time-format';
 
 export interface RecentTradeTableModel{
@@ -11,7 +11,12 @@ export interface RecentTradeTableModel{
     direction: string;
 }
 
-export class Transaction extends React.Component<{dataSource: RecentTradeTableModel[], height: number}>{
+export interface Props{
+    dataSource: RecentTradeTableModel[];
+    height: number;
+}
+
+export class Transaction extends React.Component<Props| {}>{
 
     columnsRender = (text, record,) =>
         (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{toFixed(text, 3)}</span>)
@@ -53,7 +58,7 @@ export class Transaction extends React.Component<{dataSource: RecentTradeTableMo
                     <span style={{color: '#ae543b'}}>B</span>
         }];
 
-        const {height, dataSource} = this.props;
+        const {height, dataSource} = this.props as Props;
         return (
             <div id="transaction_table">
                 <Table

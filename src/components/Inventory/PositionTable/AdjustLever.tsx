@@ -1,10 +1,10 @@
 import * as React from 'react';
 import {Modal,InputNumber, Button, notification, Row, Col, Slider, Icon} from 'antd';
-import {patchLeverage} from '../../api/Index';
+import {patchLeverage} from '../../../api/Index';
 
 export class AdjustLever extends React.Component<{
-    updatePosition: () => void;     //刷新持仓列表
-    productId: number,              //产品id
+    getPositionList: () => void;     //刷新持仓列表
+    productId: number,               //产品id
 }, {
     visible: boolean,
     lever: number,
@@ -36,7 +36,7 @@ export class AdjustLever extends React.Component<{
                 message: '操作失败',
                 description: ex.message,
             });
-        }).then(()=>this.props.updatePosition());
+        }).then(()=>this.props.getPositionList());
 
     }
 

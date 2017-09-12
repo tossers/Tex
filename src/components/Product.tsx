@@ -3,19 +3,19 @@ import {match} from 'react-router-dom';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './Product.css';
-import {Entrust} from './Entrust';
 import {Card} from 'antd';
-import {Inventory, PositionTableModel, EntrustTableModel, OrderTableModel} from './Inventory/index';
-import {RecentTradeTableModel, Transaction} from './Transaction';
-import {OrderBook, OrderBookTableModel} from './OrderBook/index';
-import {Assets, AssetsModel} from './Assets/Assets';
+import {Inventory} from './Inventory/Inventory';
 import {config} from '../config';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 import {toFixed} from '../util';
+import {TransactionC, RecentTradeTableModel} from './Transaction/TransactionC';
+import {AssetsC, AssetsModel} from './Assets/AssetsC';
+import {OrderBookC, OrderBookTableModel} from './OrderBook/OrderBookC';
+import {EntrustC} from './Entrust/EntrustC';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const initLayouts = localStorage.layouts? JSON.parse(localStorage.layouts): config.initLayouts;
 
-interface LayoutModel{
+export interface LayoutModel{
     i: string;
     x: number;
     y: number;
@@ -37,47 +37,27 @@ interface OrderBookModel{
 }
 
 export class Product extends React.Component<{
-    ordersTotal: number;                                    //成交单总数
-    dealOrders: OrderTableModel[];                          //成交单
     assetsId: number;                                       //资金账户id
     lastPrice: number;                                      //最新价格
     onWSReceiveOrder: boolean;                              //ws接收到order信息标志
-    products: ProductModel[];                               //产品列表
     assets: AssetsModel;                                    //用户资金
     orderBook: OrderBookModel;                              //盘口信息
     trade: RecentTradeTableModel[];                         //最近成交
-    entrusts: EntrustTableModel[];                          //委托列表
-    positionsDataSource: PositionTableModel[];              //持仓列表
     getPositionList:() => void;                             //获取持仓列表
-    deletePosition:(id: number) => Promise<void>;           //平仓操作
-    getUserAssets: () => Promise<void>;                     //获取用户资金
-    setOnWSReceiveOrderFalse: () => void;                   //将ws接收到order信息标志重置
+    getUserAssets: () => void;                              //获取用户资金
+    updateDealOrders:() => void;                            //更新成交单
+    updateEntrustList: () => void;                          //更新委托列表
     subscribe:(productId:number, assetsId: number)=>void;   //ws订阅
     unSubscribe:(productId:number)=>void;                   //ws取消订阅
-    getDealOrders: (page: number, size: number) => Promise<void>; //获取成交单
+    setCardHeight: (currentLayout: LayoutModel[]) => void;
     getProduct: (productCode: string) => {};
     product: ProductModel;
     match: match<{ id: number }>;
-    getEntrusts: () => Promise<void>;
-    delEntrust: (entrustId: number) => Promise<void>;
-    entrust: (type: string, productId: string, price: number, quantity: number, lever: number) => Promise<void>;
-}, {
-    orderBookHeight: number;
-    positionHeight: number;
-    transactionHeight: number;
+    setLastPriceClolr: (color: string) => void;
     lastPriceClolr: string;
-}> {
-
-    state = {
-        orderBookHeight: 5,
-        transactionHeight: 4,
-        positionHeight: 5,
-        lastPriceClolr: 'rgb(62, 134, 84)',
-    };
-
+},{}> {
     componentDidMount() {
         this.props.getProduct(this.props.match.params.id.toString());
-        this.onUpdate();
     }
 
     componentDidUpdate() {
@@ -86,16 +66,18 @@ export class Product extends React.Component<{
     }
 
     componentWillReceiveProps(props: { trade: RecentTradeTableModel[], product: { id: number }, assetsId: number, onWSReceiveOrder: boolean}) {
-        if(props.onWSReceiveOrder){
-            this.props.setOnWSReceiveOrderFalse();
-            this.onUpdate();
+        if(props.onWSReceiveOrder && !this.props.onWSReceiveOrder){
+            this.props.getPositionList();
+            this.props.getUserAssets();
+            this.props.updateDealOrders();
+            this.props.updateEntrustList();
         }
 
         if(this.props.trade[0] && props.trade[0]){
             if(props.trade[0].price - this.props.trade[0].price > 0){
-                this.setState({lastPriceClolr: 'rgb(174, 84, 59)'});
+                this.props.setLastPriceClolr('rgb(174, 84, 59)');
             }else{
-                this.setState({lastPriceClolr: 'rgb(62, 134, 84)'});
+                this.props.setLastPriceClolr('rgb(62, 134, 84)');
             }
         }
 
@@ -107,27 +89,14 @@ export class Product extends React.Component<{
         }
     }
 
-    onLayoutChange = (currentLayout: LayoutModel[], allLayouts: LayoutModel) => {
-        currentLayout.forEach((item) => {
-            if(item.i === 'trading'){
-                this.setState({transactionHeight: item.h});
-            }else if(item.i === 'position'){
-                this.setState({positionHeight: item.h});
-            }else if(item.i === 'entrustList'){
-                this.setState({orderBookHeight: item.h});
-            }
-        });
+    onLayoutChange = (currentLayout, allLayouts) => {
+        console.log('onLayoutChange');
+        this.props.setCardHeight(currentLayout);
         localStorage.layouts = JSON.stringify(allLayouts);
     }
 
-    onUpdate = () => {
-        this.props.getPositionList();
-        this.props.getEntrusts();
-        this.props.getUserAssets();
-    }
-
-    chartTitle = (color: string) => {
-        const {orderBook, trade} = this.props;
+    chartTitle = () => {
+        const {orderBook, trade, lastPriceClolr} = this.props;
         const {buyData, sellData} = orderBook;
         return (
             <div style={{width: '100%'}}>
@@ -142,30 +111,16 @@ export class Product extends React.Component<{
                 </div>
                 <div className="detailHeader">
                     <div>最新价</div>
-                    <div className="numberFont" style={{color}}>{trade[0]? toFixed(trade[0].price, 3): 0}</div>
+                    <div className="numberFont" style={{color: lastPriceClolr}}>
+                        {trade[0]? toFixed(trade[0].price, 3): 0}
+                    </div>
                 </div>
             </div>
         );
     }
 
     render() {
-        const {
-            getEntrusts,
-            getUserAssets,
-            getPositionList,
-            products,
-            product,
-            entrust,
-            entrusts,
-            orderBook,
-            trade,
-            deletePosition,
-            positionsDataSource,
-            assets,
-            lastPrice,
-            dealOrders,
-        } = this.props;
-
+        const {product,} = this.props;
         return (
             //rowHeight有10px的误差
             <ResponsiveReactGridLayout
@@ -176,57 +131,18 @@ export class Product extends React.Component<{
                 breakpoints={{md: 1000, sm: 780, xs: 450, xxs: 0}}
                 cols={{lg: 12, md: 12, sm: 12, xs: 12, xxs: 12}}
             >
-                <Card className="item" title="委托列表" key="entrustList" >
-                    <OrderBook
-                        height={this.state.orderBookHeight}
-                        buyData={orderBook.buyData}
-                        sellData={orderBook.sellData}
-                    />
-                </Card>
-                <Card className="item" title={this.chartTitle(this.state.lastPriceClolr)} key="chart">
+                <Card className="item" title="委托列表" key="entrustList" ><OrderBookC /></Card>
+                <Card className="item" title={this.chartTitle()} key="chart">
                     <iframe
                         style={{border: '0', width: '100%', height: '100%'}}
                         src={'http://chart.tex.tuling.me/?productId=' + product.id}
                     />
                 </Card>
-                <Card className="item" title="近期交易" key="trading" >
-                    <Transaction
-                        dataSource={trade}
-                        height={this.state.transactionHeight}
-                    />
-                </Card>
-                <Card className="item" title="委托" key="entrust">
-                    <Entrust
-                        availableassets={assets.available}
-                        lastPrice={lastPrice}
-                        onUpdate={this.onUpdate}
-                        entrust={async (type: string, price: number, quantity: number, lever: number) => {
-                        return entrust(type, product.id.toString(), price, quantity, lever);
-                    }}/>
-                </Card>
-                <Card className="item" key="position" >
-                    <Inventory
-                        ordersTotal={this.props.ordersTotal}
-                        getDealOrders={this.props.getDealOrders}
-                        dealOrders={dealOrders}
-                        updateEntrust={getEntrusts}
-                        updatePositionList={getPositionList}
-                        updateUserAssets={getUserAssets}
-                        availableAssets={assets.available}
-                        products={products}
-                        height={this.state.positionHeight}
-                        deletePosition={deletePosition}
-                        positionsDataSource={positionsDataSource}
-                        entrusts={entrusts}
-                        onDeleteEntrust={this.props.delEntrust}
-                    />
-                </Card>
-                <Card className="item" title="保证金" key="bond" >
-                    <Assets assets={assets}/>
-                </Card>
+                <Card className="item" title="近期交易" key="trading" ><TransactionC /></Card>
+                <Card className="item" title="委托" key="entrust"><EntrustC /></Card>
+                <Card className="item" key="position" ><Inventory /></Card>
+                <Card className="item" title="保证金" key="bond" ><AssetsC /></Card>
             </ResponsiveReactGridLayout>
         );
-
     }
-
 }

@@ -9,9 +9,19 @@ export interface AssetsModel {
     trust: number;                //委托保证金
 }
 
-export class Assets extends React.Component<{assets: AssetsModel}>{
+export interface Props{
+    assets: AssetsModel;
+    getUserAssets: () => void;
+}
+
+export class Assets extends React.Component<Props| {}>{
+    componentWillMount(){
+        const {getUserAssets} = this.props as Props;
+        getUserAssets();
+    }
+
     render(){
-        const {assets} = this.props;
+        const {assets} = this.props as Props;
         const style = {float: 'right'};
         return (
             <ul style={{padding: '16px'}}>

@@ -1,40 +1,50 @@
 import * as React from 'react';
 import './Entrust.css';
 import {Row, Col, notification, Spin, Form, InputNumber, Button, Slider} from 'antd';
-
+// import {toFixed} from '../util';
 const FormItem = Form.Item;
 
-export class Entrust extends React.Component<{
-    availableassets: number         //用户资金
-    lastPrice: number,              //最新价格
-    onUpdate: ()=> void,
-    entrust: (type: string, price: number, quantity: number, lever:number,) => Promise<void> },
-    { spinning: boolean, price: number, quantity: number, lever: number}> {
+export interface Props{
+    availableassets: number;         //用户资金
+    lastPrice: number;               //最新价格
+    updateEntrustList: () => void;   //刷新委托列表
+    getUserAssets: () => void;       //刷新资金账户
+    product: {id: number};
+    entrust: (type: string, productId: string, price: number, quantity: number, lever: number) => Promise<void>;
+}
+
+export class Entrust extends React.Component< Props| {}, {
+        spinning: boolean,
+        price: number,
+        quantity: number,
+        lever: number,
+    }> {
 
     state = {
         spinning: false,
         price: 1,
         quantity: 1,
-        lever: 1,
+        lever: 0,
         rate: 0.01,
     };
 
-    // timer;
-
     componentWillReceiveProps(props: {lastPrice: number}){
-        if(this.props.lastPrice !== props.lastPrice){
+        const {lastPrice} = this.props as Props;
+        if(lastPrice !== props.lastPrice){
             this.setState({price: props.lastPrice});
         }
     }
 
     entrust(type: string) {
+        const {entrust, product, updateEntrustList, getUserAssets} = this.props as Props;
+        const {price, quantity, lever} = this.state;
         this.setState({
             spinning: true
         });
-        this.props.entrust(type, this.state.price, this.state.quantity, this.state.lever).then(() => {
+        entrust(type, product.id.toString(), price, quantity, lever).then(() => {
             notification.success({
                 message: '下单成功',
-                description: '下单成功'
+                description: '下单成功',
             });
         }).catch((ex) => {
             notification.error({
@@ -46,7 +56,8 @@ export class Entrust extends React.Component<{
                 spinning: false
             });
         }).then(()=>{
-            this.props.onUpdate();
+            updateEntrustList();
+            getUserAssets();
         });
     }
 
@@ -133,8 +144,14 @@ export class Entrust extends React.Component<{
                             style={{marginBottom: '0'}}
                             {...formItemLayout}
                             label="价格">
-                            <InputNumber formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                         value={price} step={0.001} min={0} precision={3} onChange={this.updatePrice}/>
+                            <InputNumber
+                                value={price}
+                                step={0.001}
+                                min={0}
+                                precision={3}
+                                onChange={this.updatePrice}
+                                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            />
                         </FormItem>
 
                             <Row>
@@ -143,22 +160,26 @@ export class Entrust extends React.Component<{
                                 </Col>
                                 <Col span={11}>
                                     <Slider
-                                        min={1}
+                                        min={0}
                                         step={1}
                                         max={100}
-                                        tipFormatter={(value) => 'x'+value}
+                                        tipFormatter={(value) => value === 0? '全仓': 'x'+value}
                                         value={lever}
                                         onChange={(value) => (this.setState({lever: Number(value)}))}
                                     />
                                 </Col>
                                 <Col span={5}>
-                                    <InputNumber
-                                        min={1}
-                                        max={100}
-                                        formatter={(value) => 'x'+value}
-                                        value={lever}
-                                        onChange={(value) => this.setState({lever: Number(value)})}
-                                    />
+                                    {
+                                        lever === 0?
+                                            <span style={{lineHeight: '2', fontSize: '14px'}}>全仓</span>:
+                                            <InputNumber
+                                                min={0}
+                                                max={100}
+                                                formatter={(value) => 'x'+value}
+                                                value={lever}
+                                                onChange={(value) => this.setState({lever: Number(value)})}
+                                            />
+                                    }
                                 </Col>
                             </Row>
                         <FormItem>

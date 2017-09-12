@@ -18,8 +18,8 @@ export class Assets {
      * @returns {Promise<TResult2|TResult1>}
      */
     @action
-    async getUserAssets() {
-        return getUserAssets().then((data: AssetsModel) => {
+    getUserAssets() {
+        getUserAssets().then((data: AssetsModel) => {
             this.assets = data;
         });
     }

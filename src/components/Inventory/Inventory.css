@@ -15,3 +15,8 @@
 .myBtnGroup .ant-btn-group{
     width: 100%
 }
+
+.inventory_style .ant-table-fixed-header .ant-table-scroll .ant-table-header{
+    overflow-y: hidden;
+    padding-right: 17px;
+}

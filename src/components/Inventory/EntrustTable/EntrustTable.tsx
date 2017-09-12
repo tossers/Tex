@@ -1,8 +1,8 @@
 import React from 'react';
 import {Table, Popconfirm, notification, Tooltip} from 'antd';
-import {toFixed} from '../../util/index';
+import {toFixed} from '../../../util/index';
 import { timeFormat } from 'd3-time-format';
-import {ProductModel} from '../Product';
+import {ProductModel} from '../../Product';
 //委托单表格DataSource
 export interface EntrustTableModel{
     key: number;
@@ -18,22 +18,30 @@ export interface EntrustTableModel{
     orderId: number;          //订单id
 }
 
-export class EntrustTable extends React.Component<{
-        products: ProductModel[],
-        dataSource: EntrustTableModel[],
-        height: number,                                           //自适应高度
-        onDeleteEntrust: (entrustId: number) => Promise<void>,    //撤单操作
-        onUpdate:() => void,                                      //撤单后更新委托列表
-        setLoading: (loading: boolean) => void,                   //设置状态
-    }>{
+export interface Props{
+    loading: boolean;
+    productList: ProductModel[];
+    dataSource: EntrustTableModel[];
+    total: number;
+    height: number;                                           //自适应高度
+    onDeleteEntrust: (entrustId: number) => Promise<void>;    //撤单操作
+    updateEntrustList:() => void;                             //撤单后更新委托列表
+    getEntrustList: (currentPage: number) => void;            //获取委托列表
+}
+
+export class EntrustTable extends React.Component<Props| {}>{
+
+    componentWillMount(){
+        const {getEntrustList} = this.props as Props;
+        getEntrustList(1);
+    }
 
     /**
      * 撤单处理
      * @param record
      */
     onDelete(record: { orderId: number }) {
-        const {onDeleteEntrust, onUpdate, setLoading} = this.props;
-        setLoading(true);
+        const {onDeleteEntrust, updateEntrustList} = this.props as Props;
         onDeleteEntrust(record.orderId)
             .then(() =>
                 notification.success({
@@ -47,8 +55,7 @@ export class EntrustTable extends React.Component<{
                     description: ex.message
                 })
             )
-            .then(() => setLoading(false))
-            .then(() => onUpdate());
+            .then(() => updateEntrustList());
     }
 
     render() {
@@ -59,7 +66,8 @@ export class EntrustTable extends React.Component<{
             key: 'productId',
             width: '10%',
             render: (text) => {
-                let temp = this.props.products.find((i)=>i.id === text);
+                const {productList} = this.props as Props;
+                let temp = productList.find((i)=>i.id === text);
                 return temp? temp.name:　text;
             }
         }, {
@@ -130,7 +138,7 @@ export class EntrustTable extends React.Component<{
                 switch(text){
                     case 1: temp = <span>下单</span>;   break;
                     case 2: temp = <span>撤单</span>;   break;
-                    case -1: temp = <span>平仓</span>;   break;
+                    case -1: temp = <span>平仓</span>;  break;
                     default: break;
                 }
                 return temp;
@@ -147,12 +155,13 @@ export class EntrustTable extends React.Component<{
             )
         }];
 
-        const {dataSource, height} = this.props;
+        const {dataSource, height, loading, total, getEntrustList} = this.props as Props;
         return (
             <Table
+                loading={loading}
                 dataSource={dataSource}
                 columns={columns}
-                pagination={false}
+                pagination={total < 100 ? false : {total, onChange: () => getEntrustList, pageSize: 100}}
                 size="small"
                 scroll={{y: height * 62 - 150}}
             />

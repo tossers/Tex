@@ -4,6 +4,8 @@ import entrustStore from './Entrust';
 import assetsStore from './Assets';
 import positionStore from './APosition';
 import dealOrderStore from './DealOrder';
+import oddStore from './Odd';
+import wsStore from './WS';
 
 export default {
     dealOrderStore,
@@ -12,4 +14,6 @@ export default {
     entrustStore,
     assetsStore,
     positionStore,
+    oddStore,
+    wsStore,
 };

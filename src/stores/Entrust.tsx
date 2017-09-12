@@ -20,8 +20,18 @@ interface EntrustModel {
 
 class Entrust {
 
-    @observable
-    list: EntrustModel[] = [];   //委托列表
+    @observable list: EntrustModel[] = [];   //委托列表
+    @observable currentPage: number = 1;
+    @observable total: number = 0;
+    @observable loading: boolean = false;
+
+    /**
+     * 刷新委托列表
+     */
+    @action
+    updateEntrustList(){
+        this.getEntrustList(this.currentPage);
+    }
 
     /**
      * 下单操作
@@ -43,9 +53,13 @@ class Entrust {
      * @returns {Promise<TResult2|TResult1>}
      */
     @action
-    async getEntrusts() {
-        return entrusts().then((list)=>{
-            this.list = list;
+    getEntrustList(currPage: number) {
+        this.loading = true;
+        entrusts(currPage).then((data)=>{
+            this.list = data.list;
+            this.total = data.total;
+            this.currentPage = data.currentPage;
+            this.loading = false;
         });
     }
 

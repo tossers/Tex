@@ -21,7 +21,7 @@ const adjustLeverageUrl: string = `${baseUrl}/position/leverage`;   //调整杠�
 
 const adjustBondUrl: string = `${baseUrl}/position/transferMargin`; //调整保证金
 
-const dealOrderUrl: string = `${baseUrl}/dealOrder`; //调整保证金
+const dealOrderUrl: string = `${baseUrl}/dealOrder`;                //调整保证金
 
 let lock: boolean = true;
 
@@ -33,8 +33,8 @@ let token: string = '';
  * @param size
  * @returns {Promise<TResult|TResult2|TResult1>}
  */
-export async function getDealOrders(page: number, size: number){
-    return axios.get(`${dealOrderUrl}/${page}/${size}`,{
+export async function getDealOrders(page: number){
+    return axios.get(`${dealOrderUrl}/${page}/100`,{
         validateStatus,
         headers: {
             token: token
@@ -154,15 +154,21 @@ export async function delEntrust(entrustId:number){
     });
 }
 
-export async function entrusts() {
+/**
+ * 获取委托列表
+ * @param currPage
+ * @returns {Promise<TResult|TResult2|TResult1>}
+ */
+export async function entrusts(currPage: number) {
     return axios.get(orderUrl, {
         validateStatus,
         params: {
             token: token,
-            pageSize:12,
+            pageSize: 100,
+            currPage,
         }
     }).then((res) => {
-        return res.data.list;
+        return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);
     });

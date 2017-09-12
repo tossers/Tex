@@ -1,58 +1,29 @@
-import {Product as Component} from '../components/Product';
+import {Product as Component, LayoutModel} from '../components/Product';
 import {inject, observer} from 'mobx-react';
 
 @inject((stores, props) => {
     return {
         ...props,
-        ordersTotal: stores.dealOrderStore.total,                   //总数
-        getDealOrders: function(page: number, size: number){                                  //获取成交单
-            return stores.dealOrderStore.getDealOrders(page, size);
-        },
-        dealOrders: stores.dealOrderStore.dealOrderDataSource,      //成交单
-        products: stores.productStore.list,
-        lastPrice: stores.productStore.lastPrice,                   //最新价格
-        onWSReceiveOrder: stores.productStore.onWSReceiveOrder,
-        setOnWSReceiveOrderFalse: function(){
-            stores.productStore.setOnWSReceiveOrderFalse();
-        },
-        assets: stores.assetsStore.assets,
-        getUserAssets: function(){
-            stores.assetsStore.getUserAssets();
-        },
-        assetsId: stores.userStore.assetsId,
-        getProduct: function (productCode: string) {
-            stores.productStore.setCurrent(productCode);
-        },
+        lastPrice: stores.wsStore.lastPrice,                   //最新价格
+        orderBook:stores.wsStore.orderBookDataSource,
+        trade:stores.wsStore.tradeDataSource,
+        onWSReceiveOrder: stores.wsStore.onWSReceiveOrder,
         product: stores.productStore.current,
-        min:stores.productStore.min,
-        orderBook:stores.productStore.orderBookDataSource,
-        trade:stores.productStore.tradeDataSource,
-        entrust: async function (type: string, productId: string, price: number, quantity: number, lever: number) {
-            return stores.entrustStore.entrust(type, productId, price, quantity, lever);
-        },
-        getEntrusts: function(){
-            stores.entrustStore.getEntrusts();
-        },
-        entrusts: stores.entrustStore.entrusDataSource,
-        delEntrust: async function(entrustId:number){
-            return stores.entrustStore.delEntrust(entrustId);
-        },
-
-        subscribe:(productId:number, assetsId: number)=>{
-            stores.productStore.subscribe(productId, assetsId);
-        },
-        unSubscribe:(productId:number)=>{
-            return stores.productStore.unSubscribe(productId);
-        },
-
-        //1.持仓列表； 2.获取持仓列表； 3.平仓操作；
-        positionsDataSource: stores.positionStore.positionsDataSource,
-        getPositionList: function () {
-            stores.positionStore.getPositionList();
-        },
-        deletePosition: function (id: number) {
-            return stores.positionStore.deletePosition(id);
-        },
+        assetsId: stores.userStore.assetsId,
+        assets: stores.assetsStore.assets,
+        orderBookHeight: stores.oddStore.orderBookHeight,
+        positionHeight: stores.oddStore.positionHeight,
+        transactionHeight: stores.oddStore.transactionHeight,
+        lastPriceClolr: stores.oddStore.lastPriceClolr,
+        getUserAssets: () => stores.assetsStore.getUserAssets(),
+        getProduct: (productCode: string) => stores.productStore.setCurrent(productCode),
+        subscribe:(productId:number, assetsId: number)=> stores.wsStore.subscribe(productId, assetsId),
+        unSubscribe:(productId:number)=>stores.wsStore.unSubscribe(productId),
+        getPositionList: () => stores.positionStore.getPositionList(),
+        updateDealOrders: () => stores.dealOrderStore.updateDealOrders(),
+        updateEntrustList: ()=> stores.entrustStore.updateEntrustList(),                                //更新委托列表
+        setCardHeight: (currentLayout: LayoutModel[]) => stores.oddStore.setCardHeight(currentLayout),
+        setLastPriceClolr: (color: string) => stores.oddStore.setLastPriceClolr(color),
     };
 })
 
