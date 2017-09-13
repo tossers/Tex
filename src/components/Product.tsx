@@ -3,7 +3,7 @@ import {match} from 'react-router-dom';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './Product.css';
-import {Card, Button} from 'antd';
+import {Card, Button, InputNumber, Modal} from 'antd';
 import {Inventory} from './Inventory/Inventory';
 import {config} from '../config';
 import {Responsive, WidthProvider} from 'react-grid-layout';
@@ -12,6 +12,7 @@ import {TransactionC, RecentTradeTableModel} from './Transaction/TransactionC';
 import {AssetsC, AssetsModel} from './Assets/AssetsC';
 import {OrderBookC, OrderBookTableModel} from './OrderBook/OrderBookC';
 import {EntrustC} from './Entrust/EntrustC';
+import {MyModal} from './MyModal/MyModal';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const initLayouts = localStorage.layouts? JSON.parse(localStorage.layouts): config.initLayouts;
 
@@ -55,6 +56,11 @@ export class Product extends React.Component<{
     match: match<{ id: number }>;
     setLastPriceClolr: (color: string) => void;
     lastPriceClolr: string;
+    recharge: () => Promise<void>;
+    changeRechargeMoney: () => void;
+    onRecharge: boolean;
+    setOnRecharge: (flag: boolean) => void;
+    rechargeMoney: number;
 },{}> {
     componentDidMount() {
         this.props.getProduct(this.props.match.params.id.toString());
@@ -120,14 +126,33 @@ export class Product extends React.Component<{
     }
 
     bondTitle = () => {
+        const {rechargeMoney, onRecharge, recharge, changeRechargeMoney, setOnRecharge, getUserAssets} = this.props;
         return (
             <div>
                 <span>保证金</span>
-                <Button
-                    style={{float: 'right'}}
-                    type="primary"
-                    ghost={true}
-                >充值</Button>
+                <MyModal
+                    title="充值"
+                    content={
+                        <InputNumber
+                            min={1}
+                            precision={3}
+                            defaultValue={rechargeMoney}
+                            onChange={changeRechargeMoney}
+                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        />
+                    }
+                    handleOk={recharge}>
+                    <Button
+                        type="primary"
+                        ghost={true}
+                        style={{float: 'right', marginTop: '10px'}}
+                    >充值</Button>
+                </MyModal>
+                <Modal visible={onRecharge}
+                       onCancel={() => setOnRecharge(false)}
+                       onOk={() => {setOnRecharge(false);getUserAssets();}}>
+                    <h2>是否已完成充值</h2>
+                </Modal>
             </div>
         );
     }

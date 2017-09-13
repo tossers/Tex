@@ -1,5 +1,5 @@
 import {action, observable} from 'mobx';
-import {login,isLogin as isLoginFn} from '../api/Index';
+import {login,isLogin as isLoginFn, recharge} from '../api/Index';
 export class User {
     @observable isLogin: boolean = false;
 
@@ -10,6 +10,32 @@ export class User {
     @observable nickName:string;
 
     @observable assetsId: number;
+
+    @observable rechargeMoney: number = 1;
+
+    @observable onRecharge: boolean = false;
+
+    @action
+    setOnRecharge(flag: boolean){
+        this.onRecharge = flag;
+    }
+
+    @action
+    changeRechargeMoney(money: number){
+        console.log(money);
+        this.rechargeMoney = money;
+    }
+
+    @action
+    async recharge(){
+        // if(this.rechargeMoney <= 0){
+        //     throw new Error('金额必须大于0');
+        // }
+        return recharge(this.rechargeMoney).then((url) => {
+            this.onRecharge = true;
+            window.open(url);
+        });
+    }
 
     @action
     async login(userName: string, passWord: string) {

@@ -23,6 +23,8 @@ const adjustBondUrl: string = `${baseUrl}/position/transferMargin`; //调整保�
 
 const dealOrderUrl: string = `${baseUrl}/dealOrder`;                //获取成交单
 
+const rechargeUrl: string = `${baseUrl}/recharge`;                //获取成交单
+
 let lock: boolean = true;
 
 // let token: string = '';
@@ -38,26 +40,42 @@ Object.defineProperty(temp, 'token', {
     }
 });
 
-export
-
-    /**
-     * 状态码校验
-     * @param status
-     * @returns {boolean}
-     */
+/**
+ * 状态码校验
+ * @param status
+ * @returns {boolean}
+ */
 const validateStatus = (status) => {
-        if (status === 401) {
-            if (lock) {
-                lock = false;
-                message.error('token失效，请重新登录');
-                setTimeout(() => {
-                    window.history.pushState({}, '', '/');
-                }, 2000);
-            }
-            return false;
+    if (status === 401) {
+        if (lock) {
+            lock = false;
+            message.error('token失效，请重新登录');
+            setTimeout(() => {
+                window.history.pushState({}, '', '/');
+            }, 2000);
         }
-        return status >= 200 && status < 300; // default
-    };
+        return false;
+    }
+    return status >= 200 && status < 300; // default
+};
+
+/**
+ * 充值
+ * @param money
+ * @returns {Promise<TResult|TResult2|TResult1>}
+ */
+export async function recharge(money: number){
+    return axios.post(`${rechargeUrl}/${money}`, {}, {
+        validateStatus,
+        headers: {
+            token: temp.token
+        }
+    }).then((res) => {
+        return res.data;
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
 
 /**
  * 获取成交单
@@ -277,7 +295,7 @@ export async function loginOut() {
     return axios.get(loginOutUrl, {
         validateStatus,
         params: {
-            token:temp.token
+            token: temp.token
         }
     }).catch((ex) => {
         throw new Error(ex.response.data);

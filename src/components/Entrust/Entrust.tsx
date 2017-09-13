@@ -173,7 +173,7 @@ export class Entrust extends React.Component< Props| {}, {
                                             min={0}
                                             step={1}
                                             max={100}
-                                            formatter={(value) => value === 0? '全仓': 'x'+value}
+                                            formatter={(value) => value === 0 || value === '0'? '全仓': 'x'+value}
                                             value={lever}
                                             onChange={(value) => this.setState({lever: Number(value)})}
                                         />
