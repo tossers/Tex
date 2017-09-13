@@ -21,11 +21,43 @@ const adjustLeverageUrl: string = `${baseUrl}/position/leverage`;   //调整杠�
 
 const adjustBondUrl: string = `${baseUrl}/position/transferMargin`; //调整保证金
 
-const dealOrderUrl: string = `${baseUrl}/dealOrder`;                //调整保证金
+const dealOrderUrl: string = `${baseUrl}/dealOrder`;                //获取成交单
 
 let lock: boolean = true;
 
-let token: string = '';
+// let token: string = '';
+
+let temp = {token: ''};
+
+Object.defineProperty(temp, 'token', {
+    get: function () {
+        return localStorage.getItem('token');
+    },
+    set: function (value: string) {
+        localStorage.setItem('token', value);
+    }
+});
+
+export
+
+    /**
+     * 状态码校验
+     * @param status
+     * @returns {boolean}
+     */
+const validateStatus = (status) => {
+        if (status === 401) {
+            if (lock) {
+                lock = false;
+                message.error('token失效，请重新登录');
+                setTimeout(() => {
+                    window.history.pushState({}, '', '/');
+                }, 2000);
+            }
+            return false;
+        }
+        return status >= 200 && status < 300; // default
+    };
 
 /**
  * 获取成交单
@@ -33,13 +65,13 @@ let token: string = '';
  * @param size
  * @returns {Promise<TResult|TResult2|TResult1>}
  */
-export async function getDealOrders(page: number){
-    return axios.get(`${dealOrderUrl}/${page}/100`,{
+export async function getDealOrders(page: number) {
+    return axios.get(`${dealOrderUrl}/${page}/100`, {
         validateStatus,
         headers: {
-            token: token
+            token: temp.token
         }
-    }).then((res)=>{
+    }).then((res) => {
         return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);
@@ -56,7 +88,7 @@ export async function postBond(productId: number, amount: number) {
     return axios.patch(`${adjustBondUrl}/${productId}/${amount}`, {}, {
         validateStatus,
         headers: {
-            token: token
+            token: temp.token
         }
     }).catch((ex) => {
         throw new Error(ex.response.data);
@@ -73,34 +105,18 @@ export async function patchLeverage(productId: number, lever: number) {
     return axios.patch(`${adjustLeverageUrl}/${productId}/${lever}`, {}, {
         validateStatus,
         headers: {
-            token: token
+            token: temp.token
         }
     }).catch((ex) => {
         throw new Error(ex.response.data);
     });
 }
 
-const validateStatus = (status) => {
-    if(status === 401){
-        if(lock){
-            lock = false;
-            message.error('token失效，请重新登录');
-            setTimeout(()=>{
-                window.location.pathname = '/';
-            }, 3000);
-        }
-        return false;
-    }
-    return status >= 200 && status < 300; // default
-};
-
-export async function isLogin(){
-    const tempToken = localStorage.getItem('token');
-    return axios.get(isLoginUrl,{params:{token:tempToken}}).then((res)=>{
-        token = tempToken||'';
+export async function isLogin() {
+    return axios.get(isLoginUrl, {params: {token: temp.token}}).then((res) => {
         return res.data;
         // console.log("===>",token);
-    }).catch((ex)=>{
+    }).catch((ex) => {
         throw new Error(ex.response.data);
     });
 }
@@ -110,8 +126,7 @@ export async function login(userName: string, passWord: string) {
         uname: userName,
         upass: passWord,
     }).then((res) => {
-        token = res.data.token;
-        localStorage.setItem('token',token);
+        temp.token = res.data.token;
         return res.data;
     }).catch((ex) => {
         throw new Error(ex.response.data);
@@ -137,7 +152,7 @@ export async function entrust(type: string, productId: string, price: number, qu
     }, {
         validateStatus,
         headers: {
-            token: token
+            token: temp.token
         }
     }).then((res) => {
         return res.data.list;
@@ -146,10 +161,12 @@ export async function entrust(type: string, productId: string, price: number, qu
     });
 }
 
-export async function delEntrust(entrustId:number){
-    return axios.delete(`${orderUrl}/${entrustId}`,{validateStatus, headers:{
-        token
-    }}).catch((ex)=>{
+export async function delEntrust(entrustId: number) {
+    return axios.delete(`${orderUrl}/${entrustId}`, {
+        validateStatus, headers: {
+            token:temp.token
+        }
+    }).catch((ex) => {
         throw new Error(ex.response.data);
     });
 }
@@ -163,7 +180,7 @@ export async function entrusts(currPage: number) {
     return axios.get(orderUrl, {
         validateStatus,
         params: {
-            token: token,
+            token: temp.token,
             pageSize: 100,
             currPage,
         }
@@ -182,7 +199,7 @@ export async function getOrder(pageNum: string | number, pageSize: string | numb
             pageSize
         },
         headers: {
-            token
+            token:temp.token
         }
     }).then((res) => {
         return res.data.list;
@@ -199,7 +216,7 @@ export async function getOrder(pageNum: string | number, pageSize: string | numb
  * @param orderBy  //字段排序
  * @returns {Promise<TResult|TResult2|TResult1>}
  */
-export async function getPositionList(currPage?: number, pageSize?: number, filter?:string, orderBy?: string) {
+export async function getPositionList(currPage?: number, pageSize?: number, filter?: string, orderBy?: string) {
     return axios.get(getPositionListUrl, {
         validateStatus,
         params: {
@@ -209,7 +226,7 @@ export async function getPositionList(currPage?: number, pageSize?: number, filt
             orderBy,
         },
         headers: {
-            token
+            token:temp.token
         }
     }).then((res) => {
         return res.data;
@@ -224,10 +241,10 @@ export async function getPositionList(currPage?: number, pageSize?: number, filt
  * @returns {Promise<TResult|AxiosResponse>}
  */
 export async function deletePosition(id: number) {
-    return axios.delete(getPositionListUrl+'/'+id, {
+    return axios.delete(getPositionListUrl + '/' + id, {
         validateStatus,
         headers: {
-            token
+            token:temp.token
         }
     }).catch((ex) => {
         throw new Error(ex.response.data);
@@ -243,7 +260,7 @@ export async function getUserAssets() {
     return axios.get(userAssetsUrl, {
         validateStatus,
         headers: {
-            token
+            token:temp.token
         }
     }).then((res) => {
         return res.data;
@@ -260,7 +277,7 @@ export async function loginOut() {
     return axios.get(loginOutUrl, {
         validateStatus,
         params: {
-            token
+            token:temp.token
         }
     }).catch((ex) => {
         throw new Error(ex.response.data);

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Table} from 'antd';
 import {toFixed} from '../../../util/index';
-import { timeFormat } from 'd3-time-format';
+import {timeFormat} from 'd3-time-format';
 
 export interface OrderTableModel{
     key: number;

@@ -1,7 +1,7 @@
 import {Table, Tooltip} from 'antd';
 import * as React from 'react';
 import {toFixed} from '../../util/index';
-import { timeFormat } from 'd3-time-format';
+import {timeFormat} from 'd3-time-format';
 
 export interface RecentTradeTableModel{
     price: number;
@@ -43,7 +43,9 @@ export class Transaction extends React.Component<Props| {}>{
             render: (text, record) =>
                 (
                     <Tooltip placement="left" title={new Date(text).toLocaleDateString()}>
-                        <span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{timeFormat('%H:%M:%S')(new Date(text))}</span>
+                        <span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>
+                            {timeFormat('%H:%M:%S')(new Date(text))}
+                        </span>
                     </Tooltip>
                 )
         }, {

@@ -1,6 +1,5 @@
 import {action, observable} from 'mobx';
 import {login,isLogin as isLoginFn} from '../api/Index';
-
 export class User {
     @observable isLogin: boolean = false;
 
@@ -21,7 +20,7 @@ export class User {
             this.uid = data.token;
             this.nickName = data.token;
             this.assetsId = data.userAssetsId;
-            localStorage.removeItem('settings');
+            // localStorage.removeItem('settings');
         });
     }
 
@@ -34,13 +33,9 @@ export class User {
     }
 
     @action
-    async logout() {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                this.isLogin = false;
-                resolve();
-            }, 2000);
-        });
+    logout() {
+        localStorage.removeItem('token');
+        this.isLogin = false;
     }
 }
 

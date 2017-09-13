@@ -114,7 +114,7 @@ export class PositionTable extends React.Component<Props| {}, {}>{
                 const {getPositionList} = this.props as Props;
                 return (
                     <span>
-                        <Popconfirm title={`你确定要平仓?仓位数量:${record.position}`} onConfirm={() => {
+                        <Popconfirm title={`你确定要平仓?仓位数量:${toFixed(record.position, 3)}`} onConfirm={() => {
                             this.onDeletePosition(record);}}>
                             <a href="#">{record.state === 2? '平仓中': '平仓'}</a>
                         </Popconfirm>

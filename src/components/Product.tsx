@@ -3,7 +3,7 @@ import {match} from 'react-router-dom';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './Product.css';
-import {Card} from 'antd';
+import {Card, Button} from 'antd';
 import {Inventory} from './Inventory/Inventory';
 import {config} from '../config';
 import {Responsive, WidthProvider} from 'react-grid-layout';
@@ -119,6 +119,19 @@ export class Product extends React.Component<{
         );
     }
 
+    bondTitle = () => {
+        return (
+            <div>
+                <span>保证金</span>
+                <Button
+                    style={{float: 'right'}}
+                    type="primary"
+                    ghost={true}
+                >充值</Button>
+            </div>
+        );
+    }
+
     render() {
         const {product,} = this.props;
         return (
@@ -141,7 +154,7 @@ export class Product extends React.Component<{
                 <Card className="item" title="近期交易" key="trading" ><TransactionC /></Card>
                 <Card className="item" title="委托" key="entrust"><EntrustC /></Card>
                 <Card className="item" key="position" ><Inventory /></Card>
-                <Card className="item" title="保证金" key="bond" ><AssetsC /></Card>
+                <Card className="item" title={this.bondTitle()} key="bond" ><AssetsC /></Card>
             </ResponsiveReactGridLayout>
         );
     }

@@ -169,17 +169,14 @@ export class Entrust extends React.Component< Props| {}, {
                                     />
                                 </Col>
                                 <Col span={5}>
-                                    {
-                                        lever === 0?
-                                            <span style={{lineHeight: '2', fontSize: '14px'}}>全仓</span>:
-                                            <InputNumber
-                                                min={0}
-                                                max={100}
-                                                formatter={(value) => 'x'+value}
-                                                value={lever}
-                                                onChange={(value) => this.setState({lever: Number(value)})}
-                                            />
-                                    }
+                                        <InputNumber
+                                            min={0}
+                                            step={1}
+                                            max={100}
+                                            formatter={(value) => value === 0? '全仓': 'x'+value}
+                                            value={lever}
+                                            onChange={(value) => this.setState({lever: Number(value)})}
+                                        />
                                 </Col>
                             </Row>
                         <FormItem>

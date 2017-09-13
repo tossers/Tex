@@ -1,7 +1,7 @@
 import React from 'react';
 import {Table, Popconfirm, notification, Tooltip} from 'antd';
 import {toFixed} from '../../../util/index';
-import { timeFormat } from 'd3-time-format';
+import {timeFormat} from 'd3-time-format';
 import {ProductModel} from '../../Product';
 //委托单表格DataSource
 export interface EntrustTableModel{

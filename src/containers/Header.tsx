@@ -11,7 +11,8 @@ import {inject, observer} from 'mobx-react';
         loadNavigation: () => {
             stores.productStore.loadProducts();
         },
-        product: stores.productStore.current
+        logout: () => stores.userStore.logout(),
+        product: stores.productStore.current,
     };
 })
 @observer

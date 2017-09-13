@@ -4,7 +4,7 @@ import {Header} from '../containers/Header';
 import {Product} from '../containers/Product';
 import {Login} from '../containers/Login';
 import {PrivateRoute} from '../containers/PrivateRoute';
-import 'antd/dist/antd.css';
+// import 'antd/dist/antd.css';
 
 export default class AppRouter extends React.Component {
 
