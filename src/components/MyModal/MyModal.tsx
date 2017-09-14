@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Modal, Icon, Button, notification} from 'antd';
+import {Modal, Icon, Button} from 'antd';
 
 export class MyModal extends React.Component<{
     content: React.ReactNode | string,
@@ -22,21 +22,13 @@ export class MyModal extends React.Component<{
 
     handleOk = (e) => {
         this.setState({loading: true});
-        this.props.handleOk().then(() => {
-            notification.success({
-                message: '操作成功',
-                description: this.props.title + '成功',
-                duration: 2,
-            });
-            this.setState({visible: false, loading: false,});
-        }).catch((ex) => {
-            notification.error({
-                message: this.props.title + '失败',
-                description: ex.message,
-            });
-            this.setState({visible: false, loading: false,});
+        this.props.handleOk().then(()=>{
+            this.setState({loading: false, visible: false});
+        }).catch(() => {
+            this.setState({loading: false, visible: false});
         });
     }
+
     handleCancel = (e) => {
         this.setState({
             visible: false,

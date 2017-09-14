@@ -3,7 +3,7 @@ import {match} from 'react-router-dom';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './Product.css';
-import {Card, Button, InputNumber, Modal, Row, Col} from 'antd';
+import {Card} from 'antd';
 import {Inventory} from './Inventory/Inventory';
 import {config} from '../config';
 import {Responsive, WidthProvider} from 'react-grid-layout';
@@ -12,7 +12,7 @@ import {TransactionC, RecentTradeTableModel} from './Transaction/TransactionC';
 import {AssetsC, AssetsModel} from './Assets/AssetsC';
 import {OrderBookC, OrderBookTableModel} from './OrderBook/OrderBookC';
 import {EntrustC} from './Entrust/EntrustC';
-import {MyModal} from './MyModal/MyModal';
+import {RechargeModalC} from './MyModal/RechargeModalC';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const initLayouts = localStorage.layouts? JSON.parse(localStorage.layouts): config.initLayouts;
 
@@ -56,11 +56,6 @@ export class Product extends React.Component<{
     match: match<{ id: number }>;
     setLastPriceClolr: (color: string) => void;
     lastPriceClolr: string;
-    recharge: () => Promise<void>;
-    changeRechargeMoney: () => void;
-    onRecharge: boolean;
-    setOnRecharge: (flag: boolean) => void;
-    rechargeMoney: number;
 },{}> {
     componentDidMount() {
         this.props.getProduct(this.props.match.params.id.toString());
@@ -125,44 +120,41 @@ export class Product extends React.Component<{
         );
     }
 
-    bondTitle = () => {
-        const {rechargeMoney, onRecharge, recharge, changeRechargeMoney, setOnRecharge, getUserAssets} = this.props;
-        return (
-            <div>
-                <span>保证金</span>
-                <MyModal
-                    title="充值"
-                    content={
-                        <Row>
-                            <Col offset={4} span={8}>
-                                <span>充值金额:</span>
-                            </Col>
-                            <Col span={8}>
-                                <InputNumber
-                                    min={1}
-                                    precision={3}
-                                    defaultValue={rechargeMoney}
-                                    onChange={changeRechargeMoney}
-                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                />
-                            </Col>
-                        </Row>
-                    }
-                    handleOk={recharge}>
-                    <Button
-                        type="primary"
-                        ghost={true}
-                        style={{float: 'right', marginTop: '10px'}}
-                    >充值</Button>
-                </MyModal>
-                <Modal visible={onRecharge}
-                       onCancel={() => setOnRecharge(false)}
-                       onOk={() => {setOnRecharge(false);getUserAssets();}}>
-                    <span>是否已完成充值</span>
-                </Modal>
-            </div>
-        );
-    }
+    // bondTitle = () => {
+    //     const {rechargeMoney, onRecharge, recharge, changeRechargeMoney, setOnRecharge, getUserAssets} = this.props;
+    //     return (
+    //         <div>
+    //             <span>保证金</span>
+    //             <MyModal
+    //                 title="充值"
+    //                 content={
+    //                    <div>
+    //                         <span>充值金额：</span>
+    //                         <InputNumber
+    //                             min={1}
+    //                             precision={3}
+    //                             defaultValue={rechargeMoney}
+    //                             onChange={changeRechargeMoney}
+    //                             formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+    //                         />
+    //                    </div>
+    //                 }
+    //                 handleOk={recharge}>
+    //                 <Button
+    //                     onClick={() => window.open('http://baidu.com')}
+    //                     type="primary"
+    //                     ghost={true}
+    //                     style={{float: 'right', marginTop: '10px'}}
+    //                 >充值</Button>
+    //             </MyModal>
+    //             <Modal visible={onRecharge}
+    //                    onCancel={() => setOnRecharge(false)}
+    //                    onOk={() => {setOnRecharge(false);getUserAssets();}}>
+    //                 <span>是否已完成充值</span>
+    //             </Modal>
+    //         </div>
+    //     );
+    // }
 
     render() {
         const {product,} = this.props;
@@ -186,7 +178,7 @@ export class Product extends React.Component<{
                 <Card className="item" title="近期交易" key="trading" ><TransactionC /></Card>
                 <Card className="item" title="委托" key="entrust"><EntrustC /></Card>
                 <Card className="item" key="position" ><Inventory /></Card>
-                <Card className="item" title={this.bondTitle()} key="bond" ><AssetsC /></Card>
+                <Card className="item" title={<RechargeModalC />} key="bond" ><AssetsC /></Card>
             </ResponsiveReactGridLayout>
         );
     }

@@ -38,4 +38,3 @@ export function sortBy(key: string){
 export function toFixed(a: number, b: number){
     return typeof(a) === 'number'? a.toFixed(b).replace(/\B(?=(\d{3})+(?!\d))/g, ','): 0;
 }
-

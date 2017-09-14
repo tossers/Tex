@@ -24,11 +24,6 @@ import {inject, observer} from 'mobx-react';
         updateEntrustList: ()=> stores.entrustStore.updateEntrustList(),                                //更新委托列表
         setCardHeight: (currentLayout: LayoutModel[]) => stores.oddStore.setCardHeight(currentLayout),
         setLastPriceClolr: (color: string) => stores.oddStore.setLastPriceClolr(color),
-        recharge: () => stores.userStore.recharge(),
-        changeRechargeMoney: (money: number) => stores.userStore.changeRechargeMoney(money),
-        onRecharge: stores.userStore.onRecharge,
-        rechargeMoney: stores.userStore.rechargeMoney,
-        setOnRecharge: (flag: boolean) => stores.userStore.setOnRecharge(flag),
     };
 })
 

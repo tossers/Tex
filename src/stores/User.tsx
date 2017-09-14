@@ -11,28 +11,14 @@ export class User {
 
     @observable assetsId: number;
 
-    @observable rechargeMoney: number = 1;
-
-    @observable onRecharge: boolean = false;
+    @observable url: string;
 
     @action
-    setOnRecharge(flag: boolean){
-        this.onRecharge = flag;
-    }
-
-    @action
-    changeRechargeMoney(money: number){
-        this.rechargeMoney = money;
-    }
-
-    @action
-    async recharge(){
-        // if(this.rechargeMoney <= 0){
-        //     throw new Error('金额必须大于0');
-        // }
-        return recharge(this.rechargeMoney).then((url) => {
-            this.onRecharge = true;
-            window.open(url);
+    async recharge(money: number){
+        return recharge(money).then((url) => {
+            this.url = url;
+        }).catch((ex) => {
+            this.url = ex.message;
         });
     }
 
