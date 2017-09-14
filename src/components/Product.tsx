@@ -3,7 +3,7 @@ import {match} from 'react-router-dom';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './Product.css';
-import {Card, Button, InputNumber, Modal} from 'antd';
+import {Card, Button, InputNumber, Modal, Row, Col} from 'antd';
 import {Inventory} from './Inventory/Inventory';
 import {config} from '../config';
 import {Responsive, WidthProvider} from 'react-grid-layout';
@@ -133,13 +133,20 @@ export class Product extends React.Component<{
                 <MyModal
                     title="充值"
                     content={
-                        <InputNumber
-                            min={1}
-                            precision={3}
-                            defaultValue={rechargeMoney}
-                            onChange={changeRechargeMoney}
-                            formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                        />
+                        <Row>
+                            <Col offset={4} span={8}>
+                                <span>充值金额:</span>
+                            </Col>
+                            <Col span={8}>
+                                <InputNumber
+                                    min={1}
+                                    precision={3}
+                                    defaultValue={rechargeMoney}
+                                    onChange={changeRechargeMoney}
+                                    formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                />
+                            </Col>
+                        </Row>
                     }
                     handleOk={recharge}>
                     <Button
@@ -151,7 +158,7 @@ export class Product extends React.Component<{
                 <Modal visible={onRecharge}
                        onCancel={() => setOnRecharge(false)}
                        onOk={() => {setOnRecharge(false);getUserAssets();}}>
-                    <h2>是否已完成充值</h2>
+                    <span>是否已完成充值</span>
                 </Modal>
             </div>
         );
