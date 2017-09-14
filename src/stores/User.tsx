@@ -22,7 +22,6 @@ export class User {
 
     @action
     changeRechargeMoney(money: number){
-        console.log(money);
         this.rechargeMoney = money;
     }
 
