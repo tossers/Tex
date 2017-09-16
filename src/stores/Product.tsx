@@ -61,6 +61,9 @@ export class ProductList {
     loadProducts() {
         getProducts().then((list) => {
             this.list = list;
+            if(list && list.length > 0){
+                this.currentProductCode = list[0].code;
+            }
         });
     }
 

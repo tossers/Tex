@@ -79,7 +79,7 @@ export class AdjustBond extends React.Component<{
             </Button.Group>
         )
 
-    titleRender = () => <h3>增加/减少仓位保证金</h3>
+    titleRender = () => <h3>增加/减少仓位保证金</h3>;
 
     render() {
         const {position, bond, available, children} = this.props;

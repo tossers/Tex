@@ -5,7 +5,7 @@ export class Throttle{
     applyTime;
     fn;
 
-    constructor(delay: number, applyTime: number, fn: ()=> void){
+    constructor(delay: number, applyTime: number, fn: (...restOfName: number[])=> void){
         this.delay = delay;
         this.applyTime = applyTime;
         this.fn = fn;

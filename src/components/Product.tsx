@@ -12,7 +12,7 @@ import {TransactionC, RecentTradeTableModel} from './Transaction/TransactionC';
 import {AssetsC, AssetsModel} from './Assets/AssetsC';
 import {OrderBookC, OrderBookTableModel} from './OrderBook/OrderBookC';
 import {EntrustC} from './Entrust/EntrustC';
-import {RechargeModalC} from './MyModal/RechargeModalC';
+import {RechargeModalC} from './MyModal/RechargeModal/RechargeModalC';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const initLayouts = localStorage.layouts? JSON.parse(localStorage.layouts): config.initLayouts;
 
@@ -105,56 +105,20 @@ export class Product extends React.Component<{
                 <div className="detailHeader">
                     <div>买一价/卖一价</div>
                     <div className="numberFont">
-                        {buyData[0]? toFixed(buyData[0].price, 3): 0}
+                        {buyData[0]? toFixed(buyData[0].price/ 1000, 3): 0}
                         /
-                        {sellData[sellData.length - 1]? toFixed(sellData[sellData.length - 1].price, 3): 0}
+                        {sellData[sellData.length - 1]? toFixed(sellData[sellData.length - 1].price/ 1000, 3): 0}
                     </div>
                 </div>
                 <div className="detailHeader">
                     <div>最新价</div>
                     <div className="numberFont" style={{color: lastPriceClolr}}>
-                        {trade[0]? toFixed(trade[0].price, 3): 0}
+                        {trade[0]? toFixed(trade[0].price/ 1000, 3): 0}
                     </div>
                 </div>
             </div>
         );
     }
-
-    // bondTitle = () => {
-    //     const {rechargeMoney, onRecharge, recharge, changeRechargeMoney, setOnRecharge, getUserAssets} = this.props;
-    //     return (
-    //         <div>
-    //             <span>保证金</span>
-    //             <MyModal
-    //                 title="充值"
-    //                 content={
-    //                    <div>
-    //                         <span>充值金额：</span>
-    //                         <InputNumber
-    //                             min={1}
-    //                             precision={3}
-    //                             defaultValue={rechargeMoney}
-    //                             onChange={changeRechargeMoney}
-    //                             formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-    //                         />
-    //                    </div>
-    //                 }
-    //                 handleOk={recharge}>
-    //                 <Button
-    //                     onClick={() => window.open('http://baidu.com')}
-    //                     type="primary"
-    //                     ghost={true}
-    //                     style={{float: 'right', marginTop: '10px'}}
-    //                 >充值</Button>
-    //             </MyModal>
-    //             <Modal visible={onRecharge}
-    //                    onCancel={() => setOnRecharge(false)}
-    //                    onOk={() => {setOnRecharge(false);getUserAssets();}}>
-    //                 <span>是否已完成充值</span>
-    //             </Modal>
-    //         </div>
-    //     );
-    // }
 
     render() {
         const {product,} = this.props;

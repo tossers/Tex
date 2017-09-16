@@ -3,6 +3,7 @@ import * as React from 'react';
 import {Header} from '../containers/Header';
 import {Product} from '../containers/Product';
 import {Login} from '../containers/Login';
+import {Register} from '../components/Register';
 import {PrivateRoute} from '../containers/PrivateRoute';
 // import 'antd/dist/antd.css';
 
@@ -15,6 +16,7 @@ export default class AppRouter extends React.Component {
                     <div style={{fontFamily:'consolas,微软雅黑'}}>
                         <Route path="/" component={Header}/>
                         <Route path="/login" component={Login}/>
+                        <Route path="/register" component={Register}/>
                         <div>
                             <PrivateRoute path="/product/:id" component={Product}/>
                         </div>

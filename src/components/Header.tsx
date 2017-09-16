@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Link} from 'react-router-dom';
 import {Menu, Icon} from 'antd';
+import {Location} from 'history';
 // import {isLogin} from '../api/Index';
 import './Header.css';
 import {Redirect} from 'react-router';
@@ -11,9 +12,14 @@ export class Header extends React.Component<{
     navigation: { text: string, link: string, id: number }[],
     user: { isLogin: boolean, nickName: string, uid: string, assetsId: number },
     logout: () => void,
-    product: { id: number },
+    product: { id: number, code: number },
     loadNavigation: () => {},
-}, {}> {
+}, {
+    currentKey: string;
+}> {
+    state = {
+        currentKey: '',
+    };
 
     componentWillMount() {
         this.props.loadNavigation();
@@ -23,13 +29,22 @@ export class Header extends React.Component<{
         if(item.key === 'logout'){
             this.props.logout();
         }
+    };
+
+    componentWillReceiveProps(Props: {navigation: { text: string, link: string, id: number }[], location?: Location}){
+        const {navigation, location} = Props;
+        if(location){
+            let temp = navigation.find((item) => item.link === location.pathname);
+            if(temp){
+                this.setState({currentKey: temp.id.toString()});
+            }
+        }
     }
 
     render() {
-        const selectKeys = this.props.product && this.props.product.id && [this.props.product.id.toString()] || [];
         return (
             <div className="headerMenu" >
-                <Menu mode={'horizontal'} onClick={this.handleOnClick} selectedKeys={selectKeys}>
+                <Menu mode={'horizontal'} onClick={this.handleOnClick} selectedKeys={[this.state.currentKey]}>
                     {
                         this.props.navigation.map((item) => {
                             return (
@@ -47,15 +62,9 @@ export class Header extends React.Component<{
                                 </Menu.Item>
                             </Menu.SubMenu>
                             :
-                           null
+                            <Redirect  to={{pathname: '/login', state: {from: this.props.location}}}/>
                     }
                 </Menu>
-                {
-                    (!this.props.user.isLogin && selectKeys.length > 0) ?
-                        <Redirect  to={{pathname: '/login', state: {from: this.props.location}}}/>
-                        :
-                        null
-                }
             </div>
         );
 

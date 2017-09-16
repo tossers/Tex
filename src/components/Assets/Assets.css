@@ -1,0 +1,24 @@
+.assets>ul{
+    padding: 16px;
+}
+
+.assets>ul>li{
+    margin-bottom: 5px;
+}
+
+.assets>ul>li>span:last-child{
+    float: right;
+}
+
+.ant-popover{
+    z-index: 99;
+}
+.picturesWall .ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-delete{
+    display: none;
+}
+.ant-form-item-label{
+    text-align: left;
+}
+.ant-upload-list-picture-card .ant-upload-list-item-uploading-text{
+    display: none;
+}

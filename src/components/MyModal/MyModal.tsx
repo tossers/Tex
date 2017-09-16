@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {Modal, Icon, Button} from 'antd';
+import {Modal, Icon, Button, Spin} from 'antd';
 
 export class MyModal extends React.Component<{
     content: React.ReactNode | string,
     title: React.ReactNode | string,
-    handleOk: () => Promise<void>,
+    handleOk: () => Promise<boolean>,
 }, {
     visible: boolean,
     loading: boolean,
@@ -20,13 +20,10 @@ export class MyModal extends React.Component<{
         });
     }
 
-    handleOk = (e) => {
+    handleOk = async (e) => {
         this.setState({loading: true});
-        this.props.handleOk().then(()=>{
-            this.setState({loading: false, visible: false});
-        }).catch(() => {
-            this.setState({loading: false, visible: false});
-        });
+        const result = await this.props.handleOk();
+        this.setState({loading: false, visible: !result});
     }
 
     handleCancel = (e) => {
@@ -39,28 +36,29 @@ export class MyModal extends React.Component<{
         (
             <Button.Group>
                 <Button onClick={this.handleCancel}><Icon type="close" />取消</Button>
-                <Button loading={this.state.loading} onClick={this.handleOk}>确认</Button>
+                <Button onClick={this.handleOk}>确认</Button>
             </Button.Group>
         )
 
     render() {
         const {content, title, children} = this.props;
-        const {visible} = this.state;
+        const {visible, loading} = this.state;
         return (
             <span onClick={this.showModal}>
-                {children}
-                <Modal
-                    style={{textAlign: 'center'}}
-                    className="myBtnGroup"
-                    footer={this.footerRender()}
-                    title={title}
-                    onCancel={this.handleCancel}
-                    visible={visible}
-                >
-                    {
-                        content
-                    }
-                </Modal>
+                    {children}
+                <Spin spinning={loading}>
+                    <Modal
+                        className="myBtnGroup"
+                        footer={this.footerRender()}
+                        title={title}
+                        onCancel={this.handleCancel}
+                        visible={visible}
+                    >
+                        {
+                            content
+                        }
+                    </Modal>
+                </Spin>
             </span>
         );
     }

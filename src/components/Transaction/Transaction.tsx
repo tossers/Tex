@@ -19,7 +19,7 @@ export interface Props{
 export class Transaction extends React.Component<Props| {}>{
 
     columnsRender = (text, record,) =>
-        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{toFixed(text, 3)}</span>)
+        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{toFixed(text/ 1000, 3)}</span>)
 
     render() {
         const columns = [{

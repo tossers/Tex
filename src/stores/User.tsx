@@ -1,5 +1,5 @@
 import {action, observable} from 'mobx';
-import {login,isLogin as isLoginFn, recharge} from '../api/Index';
+import {login,isLogin as isLoginFn, recharge, identityCheck, identityCheckStatus} from '../api/Index';
 export class User {
     @observable isLogin: boolean = false;
 
@@ -7,11 +7,19 @@ export class User {
 
     @observable token: string;
 
-    @observable nickName:string;
+    @observable name:string = 'guest';
 
     @observable assetsId: number;
 
     @observable url: string;
+
+    @observable checkStatus: string;
+
+    @observable topUrl: string;
+
+    @observable underUrl: string;
+
+    @observable identityId: string;
 
     @action
     async recharge(money: number){
@@ -29,7 +37,6 @@ export class User {
             this.isLogin = true;
             this.token = data.token;
             this.uid = data.token;
-            this.nickName = data.token;
             this.assetsId = data.userAssetsId;
             // localStorage.removeItem('settings');
         });
@@ -47,6 +54,24 @@ export class User {
     logout() {
         localStorage.removeItem('token');
         this.isLogin = false;
+    }
+
+    @action
+    identityCheck(identityId: string, name: string, topper: string, under: string){
+        return identityCheck(identityId, name, topper, under).then(() => {
+            this.name = name;
+        });
+    }
+
+    @action
+    identityCheckStatus(){
+        return identityCheckStatus().then(result => {
+            this.name = result.name || 'guest';
+            this.identityId = result.id || '';
+            this.checkStatus = result.status;
+            this.topUrl = result.topper;
+            this.underUrl = result.under;
+        }).catch(() => {return ;});
     }
 }
 

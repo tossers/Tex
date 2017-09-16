@@ -1,11 +1,15 @@
 import axios from 'axios';
 import {message} from 'antd';
 
+const registerHost: string = 'http://user.cavacn.com:3000/api/user';
+
 const baseUrl: string = 'http://tex.tuling.me:81/api';
 
 const loginUrl: string = `${baseUrl}/user/login`;
 
 const loginOutUrl: string = `${baseUrl}/user/logout`;
+
+const identityUrl: string = `${baseUrl}/user/identity`;        //提交身份验证
 
 const productUrl: string = `${baseUrl}/product`;
 
@@ -23,7 +27,11 @@ const adjustBondUrl: string = `${baseUrl}/position/transferMargin`; //调整保�
 
 const dealOrderUrl: string = `${baseUrl}/dealOrder`;                //获取成交单
 
-const rechargeUrl: string = `${baseUrl}/recharge`;                //获取成交单
+const rechargeUrl: string = `${baseUrl}/recharge`;                  //获取成交单
+
+const sendMessageUrl: string = `${registerHost}/sendsms`;           //发送短信验证码
+
+const registByPhoneUrl: string = `${registerHost}/registbyphone`;   //手机注册
 
 let lock: boolean = true;
 
@@ -48,16 +56,107 @@ Object.defineProperty(temp, 'token', {
 const validateStatus = (status) => {
     if (status === 401) {
         if (lock) {
+            temp.token = '';
             lock = false;
             message.error('token失效，请重新登录');
-            setTimeout(() => {
-                window.history.pushState({}, '', '/');
-            }, 2000);
+            // setTimeout(() => {
+            //     window.location.pathname = '/';
+            // }, 2000);
         }
         return false;
     }
     return status >= 200 && status < 300; // default
 };
+
+/**
+ * 上传身份证
+ * @param {string} identityId
+ * @param {string} name
+ * @param {string} topper
+ * @param {string} under
+ * @returns {Promise<never | AxiosResponse>}
+ */
+export async function identityCheck(id: string, name: string, topper: string, under: string){
+    return axios.post(identityUrl, {
+        id,
+        name,
+        topper,
+        under,
+    },{
+        validateStatus,
+        headers: {
+            token: temp.token
+        }
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 获取身份证验证状态
+ * @param {string} identityId
+ * @param {string} name
+ * @param {string} topper
+ * @param {string} under
+ * @returns {Promise<never | AxiosResponse>}
+ */
+export async function identityCheckStatus(){
+    return axios.get(identityUrl, {
+        validateStatus,
+        headers: {
+            token: temp.token
+        }
+    }).then((res) => {
+        return res.data;
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 发送短信验证码
+ * @param {number} phone
+ * @returns {Promise<void>}
+ */
+export async function sendMessage(phone: string){
+    return axios.get(sendMessageUrl, {
+        validateStatus,
+        params: {
+            phone,
+            method: 'regist',
+            company: '粒氏集团',
+            iou: 1,
+        }
+    }).then((res) => {
+        return res.data.result;
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
+
+/**
+ * 手机注册
+ * @param {number} id
+ * @param {string} upass
+ * @param {number | string} code
+ * @returns {Promise<never | AxiosResponse>}
+ */
+export async function registByPhone(id: number, upass: string, code: number | string){
+    return axios.get(registByPhoneUrl, {
+        params: {
+            method: 'regist',
+            id,
+            upass,
+            repass: upass,
+            iou: 1,
+            code,
+        }
+    }).then((res) => {
+        return res.data.code;
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
 
 /**
  * 充值
@@ -130,13 +229,22 @@ export async function patchLeverage(productId: number, lever: number) {
     });
 }
 
+/**
+ * 校验token
+ * @returns {Promise<never | AxiosResponse>}
+ */
 export async function isLogin() {
-    return axios.get(isLoginUrl, {params: {token: temp.token}}).then((res) => {
-        return res.data;
-        // console.log("===>",token);
-    }).catch((ex) => {
-        throw new Error(ex.response.data);
-    });
+    if(temp.token){
+        return axios.get(isLoginUrl, {params: {token: temp.token}}).then((res) => {
+            return res.data;
+            // console.log("===>",token);
+        }).catch((ex) => {
+            throw new Error(ex.response.data);
+        });
+    }else {
+        temp.token = '';
+        throw new Error('token为空');
+    }
 }
 
 export async function login(userName: string, passWord: string) {
@@ -160,7 +268,7 @@ export async function getProducts() {
 }
 
 export async function entrust(type: string, productId: string, price: number, quantity: number, lever: number) {
-    const orderType = type === 'buy' ? 1 : 2;
+    const orderType = type === 'buy' ? 1 : -1;
     return axios.post(orderUrl, {
         lever,
         type: orderType,

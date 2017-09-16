@@ -35,6 +35,6 @@ export function sortBy(key: string){
  * @param b
  * @returns {string|number}
  */
-export function toFixed(a: number, b: number){
+export function toFixed(a: any, b: number){
     return typeof(a) === 'number'? a.toFixed(b).replace(/\B(?=(\d{3})+(?!\d))/g, ','): 0;
 }

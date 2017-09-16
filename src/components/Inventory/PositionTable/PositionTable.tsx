@@ -70,7 +70,7 @@ export class PositionTable extends React.Component<Props| {}, {}>{
             dataIndex: 'position',
             key: 'position',
             width: 100/len + '%',
-            render: (text) => (toFixed(text, 3)),
+            render: (text) => (toFixed(text/ 1000, 3)),
         },{
             title: '保证金',
             dataIndex: 'bond',
@@ -100,7 +100,7 @@ export class PositionTable extends React.Component<Props| {}, {}>{
             dataIndex: 'avgPrice',
             key: 'avgPrice',
             width: 100/len + '%',
-            render: (text) => (toFixed(text, 3)),
+            render: (text) => (toFixed(text/ 1000, 3)),
         },{
             title: '杠杆倍数',
             dataIndex: 'lever',

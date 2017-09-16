@@ -75,13 +75,13 @@ export class EntrustTable extends React.Component<Props| {}>{
             dataIndex: 'price',
             key: 'price',
             width: '10%',
-            render: (text) => (toFixed(text, 3)),
+            render: (text) => (toFixed(text/ 1000, 3)),
         }, {
             title: '仓位数量',
             dataIndex: 'quantity',
             key: 'quantity',
             width: '10%',
-            render: (text) => (toFixed(text, 3)),
+            render: (text) => (toFixed(text/ 1000, 3)),
         }, {
             title: '杠杆倍数',
             dataIndex: 'lever',
@@ -93,13 +93,13 @@ export class EntrustTable extends React.Component<Props| {}>{
             key: 'type',
             width: '10%',
             render:(text) => {
-                //BUY,SELL,SHORT,COVER分别用1,2,3,4表示
+                //BUY,SELL分别用1,-1表示
                 let temp = text;
                 switch(text){
-                    case 1: temp = <span>BUY</span>;   break;
-                    case 2: temp = <span>SELL</span>;  break;
-                    case 3: temp = <span>SHORT</span>; break;
-                    case 4: temp = <span>COVER</span>; break;
+                    case 1:  temp = <span>BUY</span>;   break;
+                    case -1: temp = <span>SELL</span>;  break;
+                    // case 3:  temp = <span>SHORT</span>; break;
+                    // case 4:  temp = <span>COVER</span>; break;
                     default: break;
                 }
                 return temp;
@@ -109,13 +109,13 @@ export class EntrustTable extends React.Component<Props| {}>{
             dataIndex: 'bond',
             key: 'bond',
             width: '10%',
-            render: (text) => (toFixed(text, 3)),
+            render: (text) => (toFixed(text/ 1000000, 3)),
         }, {
             title: '剩余仓位',
             dataIndex: 'residue',
             key: 'residue',
             width: '10%',
-            render: (text) => (toFixed(text, 3)),
+            render: (text) => (toFixed(text/ 1000, 3)),
         }, {
             title: '订单时间',
             dataIndex: 'createdAt',
