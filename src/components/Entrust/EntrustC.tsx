@@ -10,6 +10,9 @@ export const EntrustC = inject((stores): Props => {
         product: stores.productStore.current,
         entrust: async (type: string, productId: string, price: number, quantity: number, lever: number) => {
             return stores.entrustStore.entrust(type, productId, price, quantity, lever);
+        },
+        stopOrder: (productId: number, stopLoss: number, stopProfit: number) => {
+            return stores.entrustStore.stopOrder(productId, stopLoss, stopProfit);
         }
     };
 })(Entrust);

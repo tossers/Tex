@@ -33,6 +33,8 @@ const sendMessageUrl: string = `${registerHost}/sendsms`;           //发送短�
 
 const registByPhoneUrl: string = `${registerHost}/registbyphone`;   //手机注册
 
+const stopOrderUrl: string = `${baseUrl}/order/stopOrder`;          //设置止盈止损
+
 let lock: boolean = true;
 
 // let token: string = '';
@@ -59,14 +61,36 @@ const validateStatus = (status) => {
             temp.token = '';
             lock = false;
             message.error('token失效，请重新登录');
-            // setTimeout(() => {
-            //     window.location.pathname = '/';
-            // }, 2000);
+            setTimeout(() => {
+                window.location.pathname = '/';
+            }, 2000);
         }
         return false;
     }
     return status >= 200 && status < 300; // default
 };
+
+/**
+ * 设置止盈止损
+ * @param {number} productId
+ * @param {number} stopLoss
+ * @param {number} stopProfit
+ * @returns {Promise<AxiosResponse>}
+ */
+export async function stopOrder(productId: number, stopLoss: number, stopProfit: number){
+    return axios.post(stopOrderUrl, {
+        productId,
+        stopLoss,
+        stopProfit,
+    },{
+        validateStatus,
+        headers: {
+            token: temp.token
+        }
+    }).catch((ex) => {
+        throw new Error(ex.response.data);
+    });
+}
 
 /**
  * 上传身份证

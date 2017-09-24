@@ -1,5 +1,9 @@
-export const config = {
-    initLayouts: {
+//资金校正
+export const priceCalibration = 1000;
+//仓位校正
+export const positionCalibration = 1000;
+//网格布局初始化
+export const initLayouts = {
         md: [
              {i: 'entrustList', x: 0, y: 0, w: 3, h: 6, minH: 5},
              {i: 'chart', x: 3, y: 0, w: 6, h: 10, minH: 0},
@@ -32,5 +36,4 @@ export const config = {
              {i: 'entrust', x: 0, y: 15, w: 12, h: 5, minH: 5},
              {i: 'position', x: 0, y: 23, w: 12, h: 5, minH: 0},
         ],
-    }
-};
+    };

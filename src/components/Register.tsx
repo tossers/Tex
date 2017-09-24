@@ -36,7 +36,7 @@ class RegisterForm extends React.Component<FormComponentProps , {
             }
             this.setState({count: count - 1});
         }, 1000);
-    }
+    };
 
     handleGetCode = () => {
         const {phone} = this.state;
@@ -51,10 +51,10 @@ class RegisterForm extends React.Component<FormComponentProps , {
         }else {
             message.error('input correct phone number');
         }
-    }
+    };
 
     checkPhone = (rule, value, callback) => {
-        let pattern = /^((\(\d{3}\))|(\d{3}\-))?13\d{9}$/;
+        let pattern = /^1[3|4|5|7|8][0-9]\d{4,8}$/;
         if (pattern.test(value)) {
             this.setState({phone: value});
             callback();
@@ -66,7 +66,7 @@ class RegisterForm extends React.Component<FormComponentProps , {
                 callback();
             }
         }
-    }
+    };
 
     checkConfirm = (rule, value, callback) => {
         const form = this.props.form;
@@ -74,7 +74,7 @@ class RegisterForm extends React.Component<FormComponentProps , {
             form.validateFields(['confirm'], { force: true });
         }
         callback();
-    }
+    };
 
     checkPassword = (rule, value, callback) => {
         const form = this.props.form;
@@ -83,12 +83,12 @@ class RegisterForm extends React.Component<FormComponentProps , {
         } else {
             callback();
         }
-    }
+    };
 
     handleConfirmBlur = (e) => {
         const value = e.target.value;
         this.setState({ confirmDirty: this.state.confirmDirty || !!value });
-    }
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();

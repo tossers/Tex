@@ -1,6 +1,7 @@
 import React from 'react';
 import {AdjustBond} from './AdjustBond';
 import {AdjustLever} from './AdjustLever';
+import {StopOrder} from '../../MyModal/StopOrder/StopOrder'
 import {Table, Popconfirm, notification} from 'antd';
 import {toFixed} from '../../../util';
 
@@ -26,6 +27,7 @@ export interface Props{
     getPositionList: () => void;                             //刷新持仓列表
     updateEntrustList: () => void;                           //刷新委托单
     getUserAssets: () => void;                               //刷新资金账户
+    stopOrder: (productId: number, stopLoss: number, stopProfit: number) => Promise<void>;  //设置止盈止损
 }
 
 export class PositionTable extends React.Component<Props| {}, {}>{
@@ -70,7 +72,7 @@ export class PositionTable extends React.Component<Props| {}, {}>{
             dataIndex: 'position',
             key: 'position',
             width: 100/len + '%',
-            render: (text) => (toFixed(text/ 1000, 3)),
+            render: (text) => (toFixed(text, 3)),
         },{
             title: '保证金',
             dataIndex: 'bond',
@@ -100,7 +102,7 @@ export class PositionTable extends React.Component<Props| {}, {}>{
             dataIndex: 'avgPrice',
             key: 'avgPrice',
             width: 100/len + '%',
-            render: (text) => (toFixed(text/ 1000, 3)),
+            render: (text) => (toFixed(text, 3)),
         },{
             title: '杠杆倍数',
             dataIndex: 'lever',
@@ -111,7 +113,7 @@ export class PositionTable extends React.Component<Props| {}, {}>{
             dataIndex: 'operation',
             width: 100/len + '%',
             render: (text, record) => {
-                const {getPositionList} = this.props as Props;
+                const {getPositionList, stopOrder} = this.props as Props;
                 return (
                     <span>
                         <Popconfirm title={`你确定要平仓?仓位数量:${toFixed(record.position, 3)}`} onConfirm={() => {
@@ -124,6 +126,14 @@ export class PositionTable extends React.Component<Props| {}, {}>{
                             productId={record.productId}>
                             <a onClick={(e) => {e.preventDefault();}} href="#">调整杠杆</a>
                         </AdjustLever>
+                        <span className="ant-divider" />
+                        <StopOrder
+                            productId={record.productId}
+                            avgPrice={record.avgPrice}
+                            position={record.position}
+                            stopOrder={stopOrder}>
+                            <a onClick={(e) => {e.preventDefault();}} href="#">止盈止损</a>
+                        </StopOrder>
                     </span>
                 );
             }

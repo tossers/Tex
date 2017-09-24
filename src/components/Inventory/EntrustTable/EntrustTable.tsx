@@ -10,7 +10,7 @@ export interface EntrustTableModel{
     price: number;            //委托价格
     quantity: number;         //数量
     lever: number;            //杠杆
-    type: number;             //订单方向（必传）----> BUY,SELL,SHORT,COVER分别用1,2,3,4表示
+    type: number;             //1为主动买入，-1为主动
     bond: number;             //下单保证金 可不传
     residue: number;          //剩余仓位 如果剩余仓位为0,表示该订单已完全成交
     createdAt: number;        //订单时间（非必传）
@@ -75,13 +75,13 @@ export class EntrustTable extends React.Component<Props| {}>{
             dataIndex: 'price',
             key: 'price',
             width: '10%',
-            render: (text) => (toFixed(text/ 1000, 3)),
+            render: (text) => (toFixed(text, 3)),
         }, {
             title: '仓位数量',
             dataIndex: 'quantity',
             key: 'quantity',
             width: '10%',
-            render: (text) => (toFixed(text/ 1000, 3)),
+            render: (text) => (toFixed(text, 3)),
         }, {
             title: '杠杆倍数',
             dataIndex: 'lever',
@@ -109,13 +109,13 @@ export class EntrustTable extends React.Component<Props| {}>{
             dataIndex: 'bond',
             key: 'bond',
             width: '10%',
-            render: (text) => (toFixed(text/ 1000000, 3)),
+            render: (text) => (toFixed(text, 3)),
         }, {
             title: '剩余仓位',
             dataIndex: 'residue',
             key: 'residue',
             width: '10%',
-            render: (text) => (toFixed(text/ 1000, 3)),
+            render: (text) => (toFixed(text, 3)),
         }, {
             title: '订单时间',
             dataIndex: 'createdAt',

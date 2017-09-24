@@ -1,6 +1,7 @@
-import {action, observable, computed} from 'mobx';
+import {action, observable} from 'mobx';
 import {getDealOrders} from '../api/Index';
 import {OrderTableModel} from '../components/Inventory/Inventory';
+import {priceCalibration, positionCalibration} from '../config';
 
 export class DealOrder {
     @observable list: OrderTableModel[] = [];     //成交单
@@ -17,6 +18,8 @@ export class DealOrder {
         this.loading = true;
         getDealOrders(page).then((data)  => {
             this.list = data.list.map((item, index: number) => {
+                item.price = item.price / priceCalibration;
+                item.quantity = item.quantity / positionCalibration;
                 return Object.assign(item, {key: index});
             });
             this.total = data.total;
@@ -33,16 +36,16 @@ export class DealOrder {
         this.getDealOrders(this.currentPage);
     }
 
-    /**
-     * 为数据添加key属性，组件Table需要唯一key
-     * @returns {[(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number})]}
-     */
-    @computed
-    get dealOrderDataSource(){
-        return this.list.map((item, index: number) => {
-            return Object.assign(item, {key: index});
-        });
-    }
+    // /**
+    //  * 为数据添加key属性，组件Table需要唯一key
+    //  * @returns {[(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number})]}
+    //  */
+    // @computed
+    // get dealOrderDataSource(){
+    //     return this.list.map((item, index: number) => {
+    //         return Object.assign(item, {key: index});
+    //     });
+    // }
 }
 
 export default new DealOrder();

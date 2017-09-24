@@ -1,5 +1,6 @@
 import {action, computed, observable} from 'mobx';
 import {deletePosition, getPositionList} from '../api/Index';
+import {priceCalibration, positionCalibration} from '../config';
 
 //持仓
 interface PositionModel{
@@ -48,6 +49,9 @@ export class APosition {
     @computed
     get positionsDataSource() {
         return this.list.map((item, index: number) => {
+            item.avgPrice = item.avgPrice / priceCalibration;
+            item.bond = item.bond / (positionCalibration * priceCalibration);
+            item.position = item.position / positionCalibration;
             return Object.assign(item, {key: index});
         });
     }

@@ -19,14 +19,14 @@ const columns = [{
             <span style={{
                 fontWeight: 'bold',
                 color: record.type === 'BUY' ? '#ae543b' : '#3e8654'
-            }}>{toFixed(text/ 1000, 3)}</span>
+            }}>{toFixed(text, 3)}</span>
         )
 }, {
     title: '数量',
     dataIndex: 'quantity',
     key: 'quantity',
     width: '33.33%',
-    render: (text) => (toFixed(text/ 1000, 3))
+    render: (text) => (toFixed(text, 3))
 }];
 
 export class OrderBookTable extends React.Component<{

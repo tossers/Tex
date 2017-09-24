@@ -1,6 +1,7 @@
 import {action, observable} from 'mobx';
 import {getUserAssets} from '../api/Index';
 import {AssetsModel} from '../components/Assets/Assets';
+import {priceCalibration, positionCalibration} from '../config';
 
 export class Assets {
     //资金账户
@@ -20,6 +21,9 @@ export class Assets {
     @action
     getUserAssets() {
         getUserAssets().then((data: AssetsModel) => {
+            data.available = data.available / (priceCalibration * positionCalibration);
+            data.margin = data.margin / (priceCalibration * positionCalibration);
+            data.trust = data.trust / (priceCalibration * positionCalibration);
             this.assets = data;
         });
     }

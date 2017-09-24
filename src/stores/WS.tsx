@@ -11,7 +11,7 @@ interface OrderBookModel {
 
 interface TradeModel {
     cancel: boolean;
-    entrustType: string;     //'BUY' or 'SELL'
+    type: number;     //1 'BUY' or -1 'SELL'
     fromID: string;
     id: number;
     price: number;
@@ -40,13 +40,6 @@ export class WS {
         this.trade = this.tradeBuffer;
         this.onWSReceiveOrder = false;
     });
-    // /**
-    //  * 重置接收order的标志
-    //  */
-    // @action
-    // setOnWSReceiveOrderFalse(){
-    //     this.onWSReceiveOrder = false;
-    // }
 
     /**
      * WS订阅
@@ -61,7 +54,7 @@ export class WS {
             args: [`orderBook:${productId}`, `trade:${productId}`, `min:${productId}`, 'order']
         });
 
-        if (!this.ws) {
+        if (!this.ws || this.ws.readyState === 2 || this.ws.readyState === 3) {
             this.ws = new MyWebSocket().getInstance(assetsId, subCmd);
         } else {
             this.ws.send(subCmd);
@@ -81,7 +74,7 @@ export class WS {
      */
     @action
     unSubscribe(productId: number) {
-        if (this.ws) {
+        if (this.ws && this.ws.readyState === 1) {
             this.ws.send(JSON.stringify({
                 'op': 'unsubscribe',
                 args: [`orderBook:${productId}`, `trade:${productId}`, `min:${productId}`, 'order']
@@ -132,30 +125,6 @@ export class WS {
         // this.throttle(500, 2500);
     }
 
-    // throttle(delay: number, applyTime: number){
-    //     if (this.timer) {
-    //         clearTimeout(this.timer);
-    //     }
-    //
-    //     let cur = Date.now();                   //记录当前时间
-    //
-    //     if (!this.start) {                      //若该函数是第一次调用，则直接设置_start,即开始时间，为_cur，即此刻的时间
-    //         this.start = cur;
-    //     }
-    //
-    //     if (cur - this.start > applyTime) {
-    //         //当前时间与上一次函数被执行的时间作差，与mustApplyTime比较，若大于，则必须执行一次函数，若小于，则重新设置计时器
-    //         this.start = cur;
-    //         this.orderBook = this.orderBookBuffer;
-    //         this.trade = this.tradeBuffer;
-    //     } else {
-    //         this.timer = setTimeout(() => {
-    //             this.orderBook = this.orderBookBuffer;
-    //             this.trade = this.tradeBuffer;
-    //         }, delay);
-    //     }
-    // }
-
     /**
      * 获取盘口信息组件Table的DataSource
      * @returns {{sellData: OrderModel[], buyData: OrderModel[]}}
@@ -166,13 +135,13 @@ export class WS {
         let sellData: OrderBookTableModel[] = sell.map((item, index) => {
             let type = 'SELL';
             const {price, quantity} = item;
-            return ({key: type+index, type, price, quantity});
+            return ({key: type+index, type, price: price / 1000, quantity: quantity / 1000});
         });
 
         let buyData: OrderBookTableModel[] = buy.map((item, index) => {
             let type = 'BUY';
             const {price, quantity} = item;
-            return({key: type+index, type, price, quantity});
+            return({key: type+index, type, price: price / 1000, quantity: quantity / 1000});
         });
         sellData = sellData.sort(sortBy('price'));
         buyData = buyData.sort(sortBy('price'));
@@ -186,8 +155,8 @@ export class WS {
     @computed
     get tradeDataSource(){
         return this.trade.map((item, index) => {
-            const {price, quantity, time, entrustType} = item;
-            return {key: index, direction: entrustType, quantity, price, time};
+            const {price, quantity, time, type} = item;
+            return {key: index, direction: type, quantity: quantity / 1000, price: price / 1000, time};
         });
     }
 

@@ -40,13 +40,13 @@ export class OrderTable extends React.Component<Props|{}, {}> {
             dataIndex: 'price',
             key: 'price',
             width: 100/len + '%',
-            render: (text) => toFixed(text/1000, 3)
+            render: (text) => toFixed(text, 3)
         },{
             title: '数量',
             dataIndex: 'quantity',
             key: 'quantity',
             width: 100/len + '%',
-            render: (text) => toFixed(text/1000, 3)
+            render: (text) => toFixed(text, 3)
         },{
             title: '类型',
             dataIndex: 'type',

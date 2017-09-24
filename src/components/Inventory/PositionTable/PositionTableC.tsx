@@ -19,6 +19,9 @@ export const PositionTableC = inject((stores): Props => {
         },
         updateEntrustList: function () {
             return stores.entrustStore.updateEntrustList();
+        },
+        stopOrder: (productId: number, stopLoss: number, stopProfit: number) => {
+            return  stores.entrustStore.stopOrder(productId, stopLoss, stopProfit);
         }
     };
 })(PositionTable);

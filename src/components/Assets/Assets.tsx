@@ -37,9 +37,9 @@ export class Assets extends React.Component<Props| {}>{
                 <ul>
                     <li><span>用户:</span><span>{name}</span></li>
                     <li><span>资金账户ID:</span><span>{assets.id}</span></li>
-                    <li><span>可用资金:</span><span>{toFixed(assets.available/ 1000000, 3)}</span></li>
-                    <li><span>成交保证金:</span><span>{toFixed(assets.margin/ 1000000, 3)}</span></li>
-                    <li><span>委托保证金:</span><span>{toFixed(assets.trust/ 1000000, 3)}</span></li>
+                    <li><span>可用资金:</span><span>{toFixed(assets.available, 3)}</span></li>
+                    <li><span>成交保证金:</span><span>{toFixed(assets.margin, 3)}</span></li>
+                    <li><span>委托保证金:</span><span>{toFixed(assets.trust, 3)}</span></li>
                     <li><span>身份验证状态:</span><span>
                         <CheckStatus
                             identityCheck={identityCheck}

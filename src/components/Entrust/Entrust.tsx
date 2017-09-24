@@ -9,6 +9,7 @@ export interface Props{
     lastPrice: number;               //最新价格
     updateEntrustList: () => void;   //刷新委托列表
     getUserAssets: () => void;       //刷新资金账户
+    stopOrder: (productId: number, stopLoss: number, stopProfit: number) => Promise<void>;  //设置止盈止损
     product: {id: number};
     entrust: (type: string, productId: string, price: number, quantity: number, lever: number) => Promise<void>;
 }
@@ -18,6 +19,8 @@ export class Entrust extends React.Component< Props| {}, {
         price: number,
         quantity: number,
         lever: number,
+        stopLoss: number,
+        stopProfit: number,
     }> {
 
     state = {
@@ -26,21 +29,24 @@ export class Entrust extends React.Component< Props| {}, {
         quantity: 1,
         lever: 0,
         rate: 0.01,
+        stopLoss: 0,
+        stopProfit: 0,
     };
 
     componentWillReceiveProps(props: {lastPrice: number}){
         const {lastPrice} = this.props as Props;
         if(lastPrice !== props.lastPrice){
-            this.setState({price: props.lastPrice});
+            this.setState({price: props.lastPrice/ 1000});
         }
     }
 
     entrust(type: string) {
-        const {entrust, product, updateEntrustList, getUserAssets} = this.props as Props;
+        const {entrust, product, updateEntrustList, getUserAssets, /*stopOrder, stopLoss, stopProfit*/} = this.props as Props;
         const {price, quantity, lever} = this.state;
         this.setState({
             spinning: true
         });
+        // stopOrder(product.id, stopLoss, stopProfit).then(() => {});
         entrust(type, product.id.toString(), price, quantity, lever).then(() => {
             notification.success({
                 message: '下单成功',
@@ -63,11 +69,19 @@ export class Entrust extends React.Component< Props| {}, {
 
     updatePrice = (price: number) => {
         this.setState({price});
-    }
+    };
 
     updateQuntity = (quantity: number)=>{
         this.setState({quantity});
-    }
+    };
+
+    updateStopProfit = (stopProfit: number)=>{
+        this.setState({stopProfit});
+    };
+
+    updateStopLoss = (stopLoss: number)=>{
+        this.setState({stopLoss});
+    };
 
     // handleRateChange = (rate) => {
     //     if(this.timer){
@@ -94,7 +108,7 @@ export class Entrust extends React.Component< Props| {}, {
             },
         };
         // const {availableassets} = this.props;
-        let {quantity, price, lever, spinning} = this.state;
+        let {quantity, price, lever, spinning, /*stopLoss, stopProfit*/} = this.state;
         // const rate = quantity * price / lever / availableassets * 100;
         return (
             <Spin spinning={spinning} tip="下单中">
@@ -153,6 +167,32 @@ export class Entrust extends React.Component< Props| {}, {
                                 formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                             />
                         </FormItem>
+                        {/*<FormItem*/}
+                            {/*style={{marginBottom: '0'}}*/}
+                            {/*{...formItemLayout}*/}
+                            {/*label="止盈">*/}
+                            {/*<InputNumber*/}
+                                {/*value={stopProfit}*/}
+                                {/*step={0.001}*/}
+                                {/*min={0}*/}
+                                {/*precision={3}*/}
+                                {/*onChange={this.updateStopProfit}*/}
+                                {/*formatter={value => value === 0 || value === '0'? '不设置': `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}*/}
+                            {/*/>*/}
+                        {/*</FormItem>*/}
+                        {/*<FormItem*/}
+                            {/*style={{marginBottom: '0'}}*/}
+                            {/*{...formItemLayout}*/}
+                            {/*label="止损">*/}
+                            {/*<InputNumber*/}
+                                {/*value={stopLoss}*/}
+                                {/*step={0.001}*/}
+                                {/*min={0}*/}
+                                {/*precision={3}*/}
+                                {/*onChange={this.updateStopLoss}*/}
+                                {/*formatter={value => value === 0 || value === '0'? '不设置': `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}*/}
+                            {/*/>*/}
+                        {/*</FormItem>*/}
 
                             <Row>
                                 <Col style={{paddingRight: '4px', textAlign: 'right', lineHeight: '2.5'}} span={6}>

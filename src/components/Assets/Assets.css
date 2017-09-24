@@ -13,12 +13,12 @@
 .ant-popover{
     z-index: 99;
 }
-.picturesWall .ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-delete{
+.ant-popover-inner-content .ant-upload-list-picture-card .ant-upload-list-item-actions .anticon-delete{
     display: none;
 }
-.ant-form-item-label{
+.ant-popover-inner-content .ant-form-item-label{
     text-align: left;
 }
-.ant-upload-list-picture-card .ant-upload-list-item-uploading-text{
+.ant-popover-inner-content .ant-upload-list-picture-card .ant-upload-list-item-uploading-text{
     display: none;
 }

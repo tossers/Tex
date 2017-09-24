@@ -5,7 +5,7 @@ export {OrderTableModel};
 
 export const OrderTableC = inject((stores): Props => {
     return {
-        dataSource: stores.dealOrderStore.dealOrderDataSource,                     //成交单
+        dataSource: stores.dealOrderStore.list,                     //成交单
         total: stores.dealOrderStore.total,
         loading: stores.dealOrderStore.loading,
         height: stores.oddStore.inventoryHeight,

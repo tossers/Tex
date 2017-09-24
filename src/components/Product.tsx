@@ -5,7 +5,7 @@ import 'react-resizable/css/styles.css';
 import './Product.css';
 import {Card} from 'antd';
 import {Inventory} from './Inventory/Inventory';
-import {config} from '../config';
+import {initLayouts as init} from '../config';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 import {toFixed} from '../util';
 import {TransactionC, RecentTradeTableModel} from './Transaction/TransactionC';
@@ -14,7 +14,7 @@ import {OrderBookC, OrderBookTableModel} from './OrderBook/OrderBookC';
 import {EntrustC} from './Entrust/EntrustC';
 import {RechargeModalC} from './MyModal/RechargeModal/RechargeModalC';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-const initLayouts = localStorage.layouts? JSON.parse(localStorage.layouts): config.initLayouts;
+const initLayouts = localStorage.layouts? JSON.parse(localStorage.layouts): init;
 
 export interface LayoutModel{
     i: string;
@@ -59,6 +59,7 @@ export class Product extends React.Component<{
 },{}> {
     componentDidMount() {
         this.props.getProduct(this.props.match.params.id.toString());
+        this.props.subscribe(this.props.product.id, this.props.assetsId);
     }
 
     componentDidUpdate() {
@@ -88,13 +89,14 @@ export class Product extends React.Component<{
             }
             this.props.subscribe(props.product.id, props.assetsId);
         }
+
     }
 
     onLayoutChange = (currentLayout, allLayouts) => {
         // console.log('onLayoutChange');
         this.props.setCardHeight(currentLayout);
         localStorage.layouts = JSON.stringify(allLayouts);
-    }
+    };
 
     chartTitle = () => {
         const {orderBook, trade, lastPriceClolr} = this.props;
@@ -105,20 +107,20 @@ export class Product extends React.Component<{
                 <div className="detailHeader">
                     <div>买一价/卖一价</div>
                     <div className="numberFont">
-                        {buyData[0]? toFixed(buyData[0].price/ 1000, 3): 0}
+                        {buyData[0]? toFixed(buyData[0].price, 3): 0}
                         /
-                        {sellData[sellData.length - 1]? toFixed(sellData[sellData.length - 1].price/ 1000, 3): 0}
+                        {sellData[sellData.length - 1]? toFixed(sellData[sellData.length - 1].price, 3): 0}
                     </div>
                 </div>
                 <div className="detailHeader">
                     <div>最新价</div>
                     <div className="numberFont" style={{color: lastPriceClolr}}>
-                        {trade[0]? toFixed(trade[0].price/ 1000, 3): 0}
+                        {trade[0]? toFixed(trade[0].price, 3): 0}
                     </div>
                 </div>
             </div>
         );
-    }
+    };
 
     render() {
         const {product,} = this.props;

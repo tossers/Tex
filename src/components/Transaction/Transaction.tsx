@@ -8,7 +8,7 @@ export interface RecentTradeTableModel{
     quantity: number;
     time: number;
     key: number;
-    direction: string;
+    direction: number;
 }
 
 export interface Props{
@@ -19,7 +19,7 @@ export interface Props{
 export class Transaction extends React.Component<Props| {}>{
 
     columnsRender = (text, record,) =>
-        (<span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>{toFixed(text/ 1000, 3)}</span>)
+        (<span style={{color:  record.direction  === -1 ?'#3e8654': '#ae543b'}}>{toFixed(text, 3)}</span>)
 
     render() {
         const columns = [{
@@ -43,7 +43,7 @@ export class Transaction extends React.Component<Props| {}>{
             render: (text, record) =>
                 (
                     <Tooltip placement="left" title={new Date(text).toLocaleDateString()}>
-                        <span style={{color:  record.direction  === 'SELL' ?'#3e8654': '#ae543b'}}>
+                        <span style={{color:  record.direction  === -1 ?'#3e8654': '#ae543b'}}>
                             {timeFormat('%H:%M:%S')(new Date(text))}
                         </span>
                     </Tooltip>
@@ -54,7 +54,7 @@ export class Transaction extends React.Component<Props| {}>{
             key: 'direction',
             width: '10%',
             render: (text, record, index) =>
-                record.direction  === 'SELL' ?
+                record.direction  === -1 ?
                     <span style={{color: '#3e8654'}}>S</span>
                     :
                     <span style={{color: '#ae543b'}}>B</span>

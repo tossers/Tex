@@ -1,41 +1,44 @@
 import * as React from 'react';
-import {Button, InputNumber, Modal, notification} from 'antd';
+import {Button, InputNumber, Modal, notification, Form} from 'antd';
 import {MyModal} from '../MyModal';
 // import {Throttle} from '../../util/Throttle';
 export interface Props{
     getUserAssets: () => void;
-    recharge: (money: number) => void;
-    url: string;
+    recharge: (money: number) => Promise<string>;
 }
 
 export class RechargeModal extends React.Component< Props| {}, {
     value: number;
     visible: boolean;
+    help: string;
+    status: 'success'| 'warning'| 'error'| 'validating'| undefined;
 }> {
     state = {
         value: 1,
         visible: false,
+        status: undefined,
+        help: '',
     };
 
-    timer;
-
     handleOnChange = (value) => {
-        if (this.timer) {
-            clearTimeout(this.timer);
+        this.check(value);
+        this.setState({value});
+    };
+
+    check(value: number){
+        if(value < 1 || isNaN(Number(value))){
+            this.setState({help: '请输入正确的数字', status: 'error'});
+        }else {
+            this.setState({help: '', status: 'success'});
         }
-        this.timer = setTimeout(() => {
-            const {recharge} = this.props as Props;
-            if(value && typeof(value) === 'number'){
-                recharge(value);
-            }
-            this.setState({value});
-        }, 300);
     }
 
     handleOk = async () => {
-        const {url} = this.props as Props;
-        const {value} = this.state;
-        if(value && typeof(value) === 'number'){
+        const {value, help} = this.state;
+        if(help === ''){
+            const {recharge} = this.props as Props;
+            let url = await recharge(value);
+
             if(url.indexOf('http:') >= 0){
                 window.open(url);
                 this.setState({visible: true});
@@ -47,21 +50,25 @@ export class RechargeModal extends React.Component< Props| {}, {
                 });
                 return false;
             }
-        }else {
-            const {recharge} = this.props as Props;
-            notification.error({
-                message: '资金充值失败',
-                description: '请输入正确的数字',
-            });
-            recharge(1);
-            this.setState({value: 1});
-            return false;
         }
-    }
+
+        return false;
+
+    };
 
     render() {
-        const {getUserAssets, recharge} = this.props as Props;
-        const {value, visible} = this.state;
+        const {getUserAssets} = this.props as Props;
+        const {value, visible, help, status} = this.state;
+        const formItemLayout = {
+            labelCol: {
+                sm: {span: 10},
+                xs: {span: 10},
+            },
+            wrapperCol: {
+                sm: {span: 7},
+                xs: {span: 7},
+            },
+        };
         return (
             <div>
                 <span>资金账户</span>
@@ -69,20 +76,27 @@ export class RechargeModal extends React.Component< Props| {}, {
                     title="资金充值"
                     handleOk={this.handleOk}
                     content={
-                        <div>
-                            <span>充值金额：</span>
-                            <InputNumber
-                                min={1}
-                                precision={3}
-                                defaultValue={value}
-                                onChange={this.handleOnChange}
-                                formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            />
-                        </div>
+                        <Form>
+                            <Form.Item
+                                {...formItemLayout}
+                                label={'充值金额'}
+                                extra="请输入大于1元的金额"
+                                validateStatus={status}
+                                help={help}
+                            >
+                                <InputNumber
+                                    style={{width: '100%'}}
+                                    min={1}
+                                    precision={3}
+                                    defaultValue={value}
+                                    onChange={this.handleOnChange}
+                                    formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                />
+                            </Form.Item>
+                        </Form>
                     }
                    >
                     <Button
-                        onClick={() => recharge(value)}
                         type="primary"
                         ghost={true}
                         style={{float: 'right', marginTop: '10px'}}

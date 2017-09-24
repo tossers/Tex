@@ -1,5 +1,6 @@
-import {entrust, entrusts, delEntrust} from '../api/Index';
+import {entrust, entrusts, delEntrust, stopOrder} from '../api/Index';
 import {action, computed, observable} from 'mobx';
+import {priceCalibration, positionCalibration} from '../config';
 
 //委托单
 interface EntrustModel {
@@ -16,6 +17,8 @@ interface EntrustModel {
     quantity: number;         //数量
     residue: number;          //剩余仓位 如果剩余仓位为0,表示该订单已完全成交
     type: number;             //订单方向（必传）----> BUY,SELL,SHORT,COVER分别用1,2,3,4表示
+    stopProfit: number;       //止盈价
+    stopLoss: number;         //止损价
 }
 
 class Entrust {
@@ -74,12 +77,30 @@ class Entrust {
     }
 
     /**
+     * 设置止盈止损
+     * @param {number} productId
+     * @param {number} stopLoss
+     * @param {number} stopProfit
+     * @returns {Promise<Promise<AxiosResponse>>}
+     */
+    @action
+    async stopOrder(productId: number, stopLoss: number, stopProfit: number){
+        return stopOrder(productId, stopLoss, stopProfit);
+    }
+
+    /**
      * 为数据添加key属性，组件Table需要唯一key
      * @returns {[(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number}),(EntrustItems&{key: number})]}
      */
     @computed
     get entrusDataSource(){
         return this.list.map((item, index: number) => {
+            item.price = item.price / priceCalibration;
+            item.stopLoss = item.stopLoss / priceCalibration;
+            item.stopProfit = item.stopProfit / priceCalibration;
+            item.bond = item.bond / priceCalibration;
+            item.quantity = item.quantity / positionCalibration;
+            item.residue = item.residue / positionCalibration;
             return Object.assign(item, {key: index});
         });
     }

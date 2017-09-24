@@ -11,8 +11,6 @@ export class User {
 
     @observable assetsId: number;
 
-    @observable url: string;
-
     @observable checkStatus: string;
 
     @observable topUrl: string;
@@ -23,11 +21,18 @@ export class User {
 
     @action
     async recharge(money: number){
-        return recharge(money).then((url) => {
-            this.url = url;
+        // return recharge(money).then((url) => {
+        //     this.url = url;
+        // }).catch((ex) => {
+        //     this.url = ex.message;
+        // });
+        let url = '';
+        url = await recharge(money).then((result) => {
+            return result;
         }).catch((ex) => {
-            this.url = ex.message;
+                url = ex.message;
         });
+        return url;
     }
 
     @action
